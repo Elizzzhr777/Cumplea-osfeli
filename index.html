@@ -171,6 +171,14 @@ function startGame(){
   play(a1);
   updateHUD();
   draw();
+  setTimeout(()=>{
+  showText([
+    "¡Hola Mi Vidam<3!",
+    "Bienvenido a esta pequeña aventura.",
+    "Camina hacia el pasto alto (abajo) para encontrar algo especial...",
+    "Usa las flechas del teclado para moverte."
+    ]);
+}, 1000);
 }
 
 function draw(){
