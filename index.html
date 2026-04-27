@@ -24,6 +24,14 @@ body{
   height:100vh;
   flex-direction:column;
   color:white;
+  /* El GIF de fondo para la primera portada */
+  background: url('img-fondo1.gif') center/cover no-repeat;
+}
+
+#menu h1 {
+  background: rgba(0,0,0,0.6);
+  padding: 10px 20px;
+  border-radius: 8px;
 }
 
 /* GAME */
@@ -31,14 +39,8 @@ body{
   position:relative;
   width:100vw;
   height:100vh;
-  background:url('img-fondo1.gif') center/cover;
-}
-
-/* GRID TILE FEEL */
-.tile{
-  position:absolute;
-  width:48px;
-  height:48px;
+  /* GIF de fondo en la aventura */
+  background:url('img-fondo1.gif') center/cover no-repeat;
 }
 
 /* PLAYER */
@@ -55,25 +57,15 @@ body{
 #yon{background-image:url('Yon.png')}
 #pika{background-image:url('pikachu.png')}
 
-/* sombra */
-.player::after{
-  content:"";
-  position:absolute;
-  bottom:-5px;
-  left:50%;
-  transform:translateX(-50%);
-  width:60%;
-  height:6px;
-  background:rgba(0,0,0,0.5);
-  border-radius:50%;
-}
-
 /* HUD */
 #hud{
   position:absolute;
   top:10px;
   left:10px;
   color:white;
+  background: rgba(0,0,0,0.5);
+  padding: 5px 10px;
+  border: 1px solid #fff;
 }
 
 /* BATTLE */
@@ -84,7 +76,13 @@ body{
   flex-direction:column;
   height:100vh;
   color:white;
-  background:black;
+  /* El GIF de Pikachu para la pantalla de batalla */
+  background: url('pikachu-pokemon.gif') center/cover no-repeat;
+}
+
+#battle h2 {
+    background: rgba(0,0,0,0.7);
+    padding: 10px;
 }
 
 /* FINAL */
@@ -92,16 +90,40 @@ body{
   display:flex;
   justify-content:center;
   align-items:center;
-  text-align:center;
+  flex-direction:column;
   color:white;
   height:100vh;
+  background: url('Image-final.jpg') center/cover no-repeat;
 }
 
-#letter{white-space:pre-line}
+#letter{
+    white-space:pre-line;
+    background: rgba(0,0,0,0.8);
+    padding: 20px;
+    border-radius: 10px;
+    max-width: 80%;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+button {
+    padding: 10px 20px;
+    cursor: pointer;
+    font-family: monospace;
+    background: #000;
+    color: #fff;
+    border: 2px solid #fff;
+    margin: 5px;
+}
 </style>
 </head>
 
 <body>
+
+<audio id="music_menu" src="cloud9.mp3" loop></audio>
+<audio id="music_game" src="just_the_way.mp3" loop></audio>
+<audio id="music_battle" src="gone.mp3" loop></audio>
+<audio id="music_final" src="extra.mp3" loop></audio>
 
 <div id="menu" class="screen active">
   <h1>POKÉMON YON</h1>
@@ -132,17 +154,26 @@ const TILE = 48;
 /* ========= STATE ========= */
 let mode="menu";
 let love=0;
-
-/* GRID POSITION (tipo Pokémon) */
 let grid = {x:4,y:2};
 let moving=false;
-
-/* FOLLOW */
 let trail=[];
 
 /* ELEMENTS */
 const yon = document.getElementById("yon");
 const pika = document.getElementById("pika");
+
+/* ========= AUDIO HELPER ========= */
+function stopAllMusic() {
+    document.querySelectorAll('audio').forEach(audio => {
+        audio.pause();
+        audio.currentTime = 0;
+    });
+}
+
+function playMusic(id) {
+    stopAllMusic();
+    document.getElementById(id).play().catch(e => console.log("Audio waiting for interaction"));
+}
 
 /* ========= SCREEN ========= */
 function show(id){
@@ -154,6 +185,7 @@ function show(id){
 function startGame(){
   mode="game";
   show("game");
+  playMusic("music_game");
   update();
 }
 
@@ -162,56 +194,41 @@ document.addEventListener("keydown",e=>{
   if(mode!=="game" || moving) return;
 
   let dx=0,dy=0;
-
   if(e.key==="ArrowUp") dy=-1;
   if(e.key==="ArrowDown") dy=1;
   if(e.key==="ArrowLeft") dx=-1;
   if(e.key==="ArrowRight") dx=1;
 
-  if(dx!==0 || dy!==0){
-    move(dx,dy);
-  }
+  if(dx!==0 || dy!==0) move(dx,dy);
 });
 
 function move(dx,dy){
   moving=true;
-
   grid.x+=dx;
   grid.y+=dy;
 
   animateMove(()=>{
-
-    // zona de pasto (abajo)
-    if(grid.y>6){
-      encounter();
-    }
-
+    if(grid.y > 6) encounter();
     moving=false;
   });
 }
 
-/* ========= ANIMATION ========= */
 function animateMove(cb){
   let startX = yon.offsetLeft;
   let startY = yon.offsetTop;
-
   let endX = grid.x*TILE;
   let endY = grid.y*TILE;
-
   let t=0;
 
   function step(){
     t+=0.1;
-
     let x = startX + (endX-startX)*t;
     let y = startY + (endY-startY)*t;
 
     yon.style.left = x+"px";
     yon.style.top = y+"px";
 
-    // follow Pikachu
-    let target = trail[0] || {x:endX,y:endY};
-
+    let target = trail[trail.length-1] || {x:startX, y:startY};
     let px = parseFloat(pika.style.left)||x;
     let py = parseFloat(pika.style.top)||y;
 
@@ -221,29 +238,24 @@ function animateMove(cb){
     pika.style.left = px+"px";
     pika.style.top = py+"px";
 
-    if(t<1){
-      requestAnimationFrame(step);
-    }else{
+    if(t<1) requestAnimationFrame(step);
+    else {
       trail.push({x:endX,y:endY});
-      if(trail.length>10) trail.shift();
+      if(trail.length>5) trail.shift();
       if(cb) cb();
     }
   }
-
   step();
 }
 
-/* ========= ENCOUNTER ========= */
 function encounter(){
-  if(Math.random()<0.3){
-    startBattle();
-  }
+  if(Math.random()<0.3) startBattle();
 }
 
-/* ========= BATTLE ========= */
 function startBattle(){
   mode="battle";
   show("battle");
+  playMusic("music_battle");
 }
 
 function choice(v){
@@ -255,13 +267,14 @@ function choice(v){
   }else{
     mode="game";
     show("game");
+    playMusic("music_game");
   }
 }
 
-/* ========= FINAL ========= */
 function finalScene(){
   mode="final";
   show("final");
+  playMusic("music_final");
 
   document.getElementById("letter").textContent = `
 Hola Yon... ♥
@@ -289,15 +302,18 @@ yo sigo eligiéndote.
 `;
 }
 
-/* ========= INIT ========= */
 function update(){
   yon.style.left = grid.x*TILE+"px";
   yon.style.top = grid.y*TILE+"px";
-
-  pika.style.left = (grid.x*TILE-50)+"px";
+  pika.style.left = (grid.x*TILE-48)+"px";
   pika.style.top = (grid.y*TILE)+"px";
 }
-</script>
 
+// Iniciar música de menú al primer clic
+window.addEventListener('click', () => {
+    if(mode === "menu") document.getElementById("music_menu").play();
+}, {once: true});
+
+</script>
 </body>
 </html>
