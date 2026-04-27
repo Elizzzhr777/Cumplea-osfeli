@@ -2,50 +2,43 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pokémon Yon — Inolvidable 💛</title>
+<title>Pokémon Yon GBA</title>
 
 <style>
 body{
   margin:0;
   background:#000;
-  color:#fff;
-  font-family:monospace;
   overflow:hidden;
+  font-family:monospace;
 }
 
-/* SCREENS */
-.screen{
-  display:none;
-  position:absolute;
-  inset:0;
-}
-
-.screen.active{
-  display:flex;
-}
+/* SCREEN */
+.screen{display:none;position:absolute;inset:0}
+.screen.active{display:block}
 
 /* MENU */
 #menu{
+  display:flex;
   justify-content:center;
   align-items:center;
+  height:100vh;
   flex-direction:column;
-}
-
-button{
-  padding:12px;
-  margin:5px;
-  background:black;
   color:white;
-  border:2px solid white;
 }
 
-/* MAP */
-#map{
-  width:100%;
-  height:100%;
-  background:url('img-fondo1.jpg') center/cover;
+/* GAME */
+#game{
   position:relative;
+  width:100vw;
+  height:100vh;
+  background:url('img-fondo1.gif') center/cover;
+}
+
+/* GRID TILE FEEL */
+.tile{
+  position:absolute;
+  width:48px;
+  height:48px;
 }
 
 /* PLAYER */
@@ -55,46 +48,56 @@ button{
   position:absolute;
   background-size:contain;
   background-repeat:no-repeat;
+  transform-origin:bottom center;
+  transition: transform 0.1s linear;
 }
 
 #yon{background-image:url('Yon.png')}
 #pika{background-image:url('pikachu.png')}
+
+/* sombra */
+.player::after{
+  content:"";
+  position:absolute;
+  bottom:-5px;
+  left:50%;
+  transform:translateX(-50%);
+  width:60%;
+  height:6px;
+  background:rgba(0,0,0,0.5);
+  border-radius:50%;
+}
 
 /* HUD */
 #hud{
   position:absolute;
   top:10px;
   left:10px;
-}
-
-/* DIALOG */
-#dialog{
-  position:absolute;
-  bottom:0;
-  width:100%;
-  background:black;
-  padding:10px;
-  display:none;
+  color:white;
 }
 
 /* BATTLE */
 #battle{
+  display:flex;
   justify-content:center;
   align-items:center;
   flex-direction:column;
-  background:url('img-fondo1.gif') center/cover;
+  height:100vh;
+  color:white;
+  background:black;
 }
 
 /* FINAL */
 #final{
+  display:flex;
   justify-content:center;
   align-items:center;
   text-align:center;
+  color:white;
+  height:100vh;
 }
 
-#letter{
-  white-space:pre-line;
-}
+#letter{white-space:pre-line}
 </style>
 </head>
 
@@ -102,159 +105,163 @@ button{
 
 <div id="menu" class="screen active">
   <h1>POKÉMON YON</h1>
-  <button id="btnStart">Nueva Aventura</button>
+  <button onclick="startGame()">Nueva Aventura</button>
 </div>
 
 <div id="game" class="screen">
-  <div id="map">
-    <div id="yon" class="player"></div>
-    <div id="pika" class="player"></div>
-  </div>
+  <div id="yon" class="player"></div>
+  <div id="pika" class="player"></div>
   <div id="hud">Amor: <span id="love">0</span></div>
 </div>
 
-<div id="dialog"></div>
-
 <div id="battle" class="screen">
   <h2>Batalla emo-cional</h2>
-  <button data-v="2">⚡ Amar x100pre</button>
-  <button data-v="1">💛 Confiar jiji</button>
-  <button data-v="-1">💔 Dudar?</button>
+  <button onclick="choice(2)">⚡ Amar x100pre</button>
+  <button onclick="choice(1)">💛 Confiar</button>
+  <button onclick="choice(-1)">💔 Dudar?</button>
 </div>
 
 <div id="final" class="screen">
   <div id="letter"></div>
 </div>
 
-<audio id="a1" src="cloud9.mp3" loop></audio>
-<audio id="a2" src="just_the_way.mp3" loop></audio>
-<audio id="a3" src="gone.mp3"></audio>
-<audio id="a4" src="extra.mp3"></audio>
-
 <script>
-/* ========= STATE ========= */
-let state = { love:0 };
-let mode = "menu"; // menu | game | battle | dialog | final
+/* ========= CONFIG ========= */
+const TILE = 48;
 
-let pos = {x:200,y:100};
+/* ========= STATE ========= */
+let mode="menu";
+let love=0;
+
+/* GRID POSITION (tipo Pokémon) */
+let grid = {x:4,y:2};
+let moving=false;
+
+/* FOLLOW */
 let trail=[];
 
-/* ========= ELEMENTS ========= */
-const screens = document.querySelectorAll(".screen");
+/* ELEMENTS */
 const yon = document.getElementById("yon");
 const pika = document.getElementById("pika");
-const dialog = document.getElementById("dialog");
-const loveEl = document.getElementById("love");
 
-const a1 = document.getElementById("a1");
-const a2 = document.getElementById("a2");
-const a3 = document.getElementById("a3");
-const a4 = document.getElementById("a4");
-const tracks=[a1,a2,a3,a4];
-
-/* ========= CORE ========= */
+/* ========= SCREEN ========= */
 function show(id){
-  screens.forEach(s=>s.classList.remove("active"));
+  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
   document.getElementById(id).classList.add("active");
 }
 
-function play(a){
-  tracks.forEach(t=>{t.pause();t.currentTime=0});
-  a.play().catch(()=>{});
-}
-
-/* ========= GAME ========= */
+/* ========= START ========= */
 function startGame(){
   mode="game";
   show("game");
-  play(a1);
-  updateHUD();
-  draw();
-
-  showDialog([
-    "¡Hola mi vidam!",
-    "Bienvenido a esta pequeña aventura.",
-    "Camina hacia abajo..."
-  ]);
+  update();
 }
 
-function draw(){
-  yon.style.left=pos.x+"px";
-  yon.style.top=pos.y+"px";
-
-  trail.push({...pos});
-  if(trail.length>10) trail.shift();
-
-  let t=trail[0]||pos;
-  pika.style.left=t.x+"px";
-  pika.style.top=t.y+"px";
-}
-
+/* ========= MOVEMENT ========= */
 document.addEventListener("keydown",e=>{
-  if(mode!=="game") return;
+  if(mode!=="game" || moving) return;
 
-  if(e.key==="ArrowUp") pos.y-=5;
-  if(e.key==="ArrowDown") pos.y+=5;
-  if(e.key==="ArrowLeft") pos.x-=5;
-  if(e.key==="ArrowRight") pos.x+=5;
+  let dx=0,dy=0;
 
-  draw();
+  if(e.key==="ArrowUp") dy=-1;
+  if(e.key==="ArrowDown") dy=1;
+  if(e.key==="ArrowLeft") dx=-1;
+  if(e.key==="ArrowRight") dx=1;
 
-  if(pos.y>300){
-    startBattle();
+  if(dx!==0 || dy!==0){
+    move(dx,dy);
   }
 });
 
-/* ========= DIALOG ========= */
-function showDialog(lines){
-  mode="dialog";
-  dialog.style.display="block";
+function move(dx,dy){
+  moving=true;
 
-  let i=0;
-  function next(){
-    if(i>=lines.length){
-      dialog.style.display="none";
-      mode="game";
-      return;
+  grid.x+=dx;
+  grid.y+=dy;
+
+  animateMove(()=>{
+
+    // zona de pasto (abajo)
+    if(grid.y>6){
+      encounter();
     }
-    dialog.innerText=lines[i++];
+
+    moving=false;
+  });
+}
+
+/* ========= ANIMATION ========= */
+function animateMove(cb){
+  let startX = yon.offsetLeft;
+  let startY = yon.offsetTop;
+
+  let endX = grid.x*TILE;
+  let endY = grid.y*TILE;
+
+  let t=0;
+
+  function step(){
+    t+=0.1;
+
+    let x = startX + (endX-startX)*t;
+    let y = startY + (endY-startY)*t;
+
+    yon.style.left = x+"px";
+    yon.style.top = y+"px";
+
+    // follow Pikachu
+    let target = trail[0] || {x:endX,y:endY};
+
+    let px = parseFloat(pika.style.left)||x;
+    let py = parseFloat(pika.style.top)||y;
+
+    px += (target.x - px)*0.2;
+    py += (target.y - py)*0.2;
+
+    pika.style.left = px+"px";
+    pika.style.top = py+"px";
+
+    if(t<1){
+      requestAnimationFrame(step);
+    }else{
+      trail.push({x:endX,y:endY});
+      if(trail.length>10) trail.shift();
+      if(cb) cb();
+    }
   }
 
-  dialog.onclick=next;
-  next();
+  step();
+}
+
+/* ========= ENCOUNTER ========= */
+function encounter(){
+  if(Math.random()<0.3){
+    startBattle();
+  }
 }
 
 /* ========= BATTLE ========= */
 function startBattle(){
-  if(mode==="battle") return;
   mode="battle";
-
   show("battle");
-  play(a3);
 }
 
-document.querySelectorAll("#battle button").forEach(btn=>{
-  btn.onclick=()=>{
-    if(mode!=="battle") return;
+function choice(v){
+  love+=v;
+  document.getElementById("love").textContent=love;
 
-    let v = Number(btn.dataset.v);
-    state.love+=v;
-
-    updateHUD();
+  if(love>=10){
+    finalScene();
+  }else{
     mode="game";
     show("game");
-
-    if(state.love>=10){
-      setTimeout(finalScene,1000);
-    }
   }
-});
+}
 
 /* ========= FINAL ========= */
 function finalScene(){
   mode="final";
   show("final");
-  play(a4);
 
   document.getElementById("letter").textContent = `
 Hola Yon... ♥
@@ -282,13 +289,14 @@ yo sigo eligiéndote.
 `;
 }
 
-/* ========= HUD ========= */
-function updateHUD(){
-  loveEl.textContent = state.love;
-}
-
 /* ========= INIT ========= */
-document.getElementById("btnStart").onclick = startGame;
+function update(){
+  yon.style.left = grid.x*TILE+"px";
+  yon.style.top = grid.y*TILE+"px";
+
+  pika.style.left = (grid.x*TILE-50)+"px";
+  pika.style.top = (grid.y*TILE)+"px";
+}
 </script>
 
 </body>
