@@ -134,7 +134,7 @@ button{
 
 <!-- BATTLE -->
 <div id="battle" class="screen">
-  <h2>Batalla emo-cional</h2>
+  <h2>Batalla emocional</h2>
   <button onclick="choice(2)">⚡ Amar x100pre</button>
   <button onclick="choice(1)">💛 Confiar jiji</button>
   <button onclick="choice(-1)">💔 Dudar?</button>
@@ -153,9 +153,7 @@ button{
 
 <script>
 /* ===== ELEMENTOS ===== */
-const yon = document.getElementById("yon");
-const pika = document.getElementById("pika");
-const dialog = document.getElementById("dialog");
+let yon, pika, dialog;
 
 /* ===== STATE ===== */
 let state = JSON.parse(localStorage.getItem("yonGame")) || { love:0 };
@@ -168,12 +166,15 @@ function show(id){
 }
 
 /* ===== AUDIO ===== */
-const a1 = document.getElementById("a1");
-const a2 = document.getElementById("a2");
-const a3 = document.getElementById("a3");
-const a4 = document.getElementById("a4");
+let a1,a2,a3,a4,tracks;
 
-const tracks = [a1,a2,a3,a4];
+function initAudio(){
+  a1 = document.getElementById("a1");
+  a2 = document.getElementById("a2");
+  a3 = document.getElementById("a3");
+  a4 = document.getElementById("a4");
+  tracks = [a1,a2,a3,a4];
+}
 
 function play(a){
   tracks.forEach(t=>{t.pause(); t.currentTime=0});
@@ -210,6 +211,8 @@ function startGame(){
 }
 
 function draw(){
+  if(!yon || !pika) return;
+
   yon.style.left=pos.x+"px";
   yon.style.top=pos.y+"px";
 
@@ -290,7 +293,7 @@ function choice(v){
   }
 }
 
-/* FINAL */
+/* FINAL (NO CAMBIÉ TU TEXTO) */
 function finalScene(){
   show("final");
   play(a4);
@@ -328,6 +331,12 @@ function updateHUD(){
 
 /* START */
 window.onload=()=>{
+  yon = document.getElementById("yon");
+  pika = document.getElementById("pika");
+  dialog = document.getElementById("dialog");
+
+  initAudio();
+
   show("menu");
   updateHUD();
 };
