@@ -6,9 +6,6 @@
 <title>Pokémon Yon — Inolvidable 💛</title>
 
 <style>
-:root{ --ui:#ffffff; }
-*{box-sizing:border-box}
-
 body{
   margin:0;
   background:#000;
@@ -17,28 +14,30 @@ body{
   overflow:hidden;
 }
 
+/* SCREENS */
 .screen{
   display:none;
   position:absolute;
   inset:0;
 }
 
+.screen.active{
+  display:flex;
+}
+
 /* MENU */
 #menu{
-  display:flex;
-  flex-direction:column;
   justify-content:center;
   align-items:center;
-  gap:10px;
-  height:100vh;
+  flex-direction:column;
 }
 
 button{
-  padding:12px 16px;
-  background:#000;
-  color:#fff;
-  border:2px solid var(--ui);
-  cursor:pointer;
+  padding:12px;
+  margin:5px;
+  background:black;
+  color:white;
+  border:2px solid white;
 }
 
 /* MAP */
@@ -63,61 +62,49 @@ button{
 
 /* HUD */
 #hud{
-  position:fixed;
+  position:absolute;
   top:10px;
   left:10px;
-  background:#000;
-  padding:10px;
-  border:2px solid var(--ui);
 }
 
 /* DIALOG */
 #dialog{
-  position:fixed;
+  position:absolute;
   bottom:0;
   width:100%;
-  background:#000;
-  padding:16px;
+  background:black;
+  padding:10px;
   display:none;
 }
 
 /* BATTLE */
 #battle{
-  display:flex;
-  flex-direction:column;
   justify-content:center;
   align-items:center;
-  height:100vh;
+  flex-direction:column;
   background:url('img-fondo1.gif') center/cover;
 }
 
 /* FINAL */
 #final{
-  display:flex;
   justify-content:center;
   align-items:center;
-  height:100vh;
   text-align:center;
 }
 
 #letter{
-  max-width:600px;
   white-space:pre-line;
-  line-height:1.6;
 }
 </style>
 </head>
 
 <body>
 
-<!-- MENU -->
-<div id="menu">
+<div id="menu" class="screen active">
   <h1>POKÉMON YON</h1>
-  <button onclick="newGame()">Nueva Aventura</button>
-  <button onclick="loadGame()">Continuar</button>
+  <button id="btnStart">Nueva Aventura</button>
 </div>
 
-<!-- GAME -->
 <div id="game" class="screen">
   <div id="map">
     <div id="yon" class="player"></div>
@@ -126,93 +113,69 @@ button{
   <div id="hud">Amor: <span id="love">0</span></div>
 </div>
 
-<!-- DIALOG -->
 <div id="dialog"></div>
 
-<!-- BATTLE -->
 <div id="battle" class="screen">
   <h2>Batalla emocional</h2>
-  <button onclick="choice(2)">⚡ Amar x100pre</button>
-  <button onclick="choice(1)">💛 Confiar jiji</button>
-  <button onclick="choice(-1)">💔 Dudar?</button>
+  <button data-v="2">⚡ Amar x100pre</button>
+  <button data-v="1">💛 Confiar jiji</button>
+  <button data-v="-1">💔 Dudar?</button>
 </div>
 
-<!-- FINAL -->
 <div id="final" class="screen">
   <div id="letter"></div>
 </div>
 
-<!-- AUDIO -->
 <audio id="a1" src="cloud9.mp3" loop></audio>
 <audio id="a2" src="just_the_way.mp3" loop></audio>
 <audio id="a3" src="gone.mp3"></audio>
 <audio id="a4" src="extra.mp3"></audio>
 
 <script>
-let yon, pika, dialog;
-let a1,a2,a3,a4,tracks;
+/* ========= STATE ========= */
+let state = { love:0 };
+let mode = "menu"; // menu | game | battle | dialog | final
 
-let state = JSON.parse(localStorage.getItem("yonGame")) || { love:0 };
-
-let pos={x:200,y:100};
+let pos = {x:200,y:100};
 let trail=[];
-let lock=false;
-let inBattle=false;
 
-function save(){
-  localStorage.setItem("yonGame", JSON.stringify(state));
-}
+/* ========= ELEMENTS ========= */
+const screens = document.querySelectorAll(".screen");
+const yon = document.getElementById("yon");
+const pika = document.getElementById("pika");
+const dialog = document.getElementById("dialog");
+const loveEl = document.getElementById("love");
 
-/* SHOW */
+const a1 = document.getElementById("a1");
+const a2 = document.getElementById("a2");
+const a3 = document.getElementById("a3");
+const a4 = document.getElementById("a4");
+const tracks=[a1,a2,a3,a4];
+
+/* ========= CORE ========= */
 function show(id){
-  document.getElementById("menu").style.display="none";
-  document.querySelectorAll(".screen").forEach(s=>s.style.display="none");
-  document.getElementById(id).style.display="block";
-}
-
-/* AUDIO */
-function initAudio(){
-  a1=document.getElementById("a1");
-  a2=document.getElementById("a2");
-  a3=document.getElementById("a3");
-  a4=document.getElementById("a4");
-  tracks=[a1,a2,a3,a4];
+  screens.forEach(s=>s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
 }
 
 function play(a){
-  tracks.forEach(t=>{
-    t.pause();
-    t.currentTime=0;
-  });
+  tracks.forEach(t=>{t.pause();t.currentTime=0});
   a.play().catch(()=>{});
 }
 
-/* MENU */
-function newGame(){
-  state={love:0};
-  save();
-  startGame();
-}
-
-function loadGame(){
-  startGame();
-}
-
-/* GAME */
+/* ========= GAME ========= */
 function startGame(){
+  mode="game";
   show("game");
   play(a1);
   updateHUD();
   draw();
 
-  setTimeout(()=>{
-    showText([
-      "¡Hola mi vidam!",
-      "Bienvenido a esta pequeña aventura.",
-      "Camina hacia abajo...",
-      "Algo especial te espera."
-    ]);
-  },1000);
+  showDialog([
+    "¡Hola mi vidam!",
+    "Bienvenido a esta pequeña aventura.",
+    "Camina hacia abajo..."
+  ]);
 }
 
 function draw(){
@@ -227,9 +190,8 @@ function draw(){
   pika.style.top=t.y+"px";
 }
 
-/* MOVIMIENTO */
 document.addEventListener("keydown",e=>{
-  if(lock) return;
+  if(mode!=="game") return;
 
   if(e.key==="ArrowUp") pos.y-=5;
   if(e.key==="ArrowDown") pos.y+=5;
@@ -237,60 +199,60 @@ document.addEventListener("keydown",e=>{
   if(e.key==="ArrowRight") pos.x+=5;
 
   draw();
-  check();
-});
 
-/* EVENTOS */
-function check(){
-  if(!inBattle && pos.y>300 && Math.random()<0.05){
-    inBattle=true;
+  if(pos.y>300){
     startBattle();
   }
-}
+});
 
-/* DIALOG */
-function showText(arr){
+/* ========= DIALOG ========= */
+function showDialog(lines){
+  mode="dialog";
   dialog.style.display="block";
-  let i=0;
-  lock=true;
 
+  let i=0;
   function next(){
-    if(i>=arr.length){
+    if(i>=lines.length){
       dialog.style.display="none";
-      lock=false;
+      mode="game";
       return;
     }
-    dialog.innerText=arr[i++];
+    dialog.innerText=lines[i++];
   }
 
   dialog.onclick=next;
   next();
 }
 
-/* BATTLE */
+/* ========= BATTLE ========= */
 function startBattle(){
-  lock=true;
+  if(mode==="battle") return;
+  mode="battle";
+
   show("battle");
   play(a3);
 }
 
-function choice(v){
-  lock=false;
-  inBattle=false;
+document.querySelectorAll("#battle button").forEach(btn=>{
+  btn.onclick=()=>{
+    if(mode!=="battle") return;
 
-  state.love+=v;
-  save();
-  updateHUD();
+    let v = Number(btn.dataset.v);
+    state.love+=v;
 
-  show("game");
+    updateHUD();
+    mode="game";
+    show("game");
 
-  if(state.love>=10){
-    setTimeout(finalScene,1000);
+    if(state.love>=10){
+      setTimeout(finalScene,1000);
+    }
   }
-}
+});
 
-/* FINAL (TU CARTA) */
+/* ========= FINAL ========= */
 function finalScene(){
+  mode="final";
   show("final");
   play(a4);
 
@@ -320,18 +282,13 @@ yo sigo eligiéndote.
 `;
 }
 
-/* HUD */
+/* ========= HUD ========= */
 function updateHUD(){
-  document.getElementById("love").textContent=state.love;
+  loveEl.textContent = state.love;
 }
 
-/* START */
-window.onload=()=>{
-  yon=document.getElementById("yon");
-  pika=document.getElementById("pika");
-  dialog=document.getElementById("dialog");
-  initAudio();
-};
+/* ========= INIT ========= */
+document.getElementById("btnStart").onclick = startGame;
 </script>
 
 </body>
