@@ -240,7 +240,8 @@ document.addEventListener("keydown",e=>{
 });
 
 function check(){
-  if(pos.y>300 && Math.random()<0.05){
+  if(!inBattle && pos.y > 300 && Math.random() < 0.05){
+    inBattle = true;
     startBattle();
   }
 }
@@ -265,19 +266,24 @@ function showText(arr){
 }
 
 /* BATTLE */
+let inBattle = false;
 function startBattle(){
+  lock = true; // 🔥 BLOQUEA movimiento
   show("battle");
   play(a3);
 }
-
 function choice(v){
-  state.love+=v;
+  lock = false; // 🔥 DESBLOQUEA
+
+  state.love += v;
   save();
   updateHUD();
+
   show("game");
 
-  if(state.love>=10){
-    setTimeout(finalScene,1000);
+  if(state.love >= 10){
+    setTimeout(finalScene, 1000);
+    inBattle = false;
   }
 }
 
