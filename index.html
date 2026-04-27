@@ -297,11 +297,11 @@ function typeSequence(lines, cb){
     let j=0;
 
     let typing=setInterval(()=>{
-      el.innerText+=line[j]||"";
+      el.textContent+=line[j]||"";
       j++;
       if(j>line.length){
         clearInterval(typing);
-        el.innerText+="\n";
+        el.textContent+="\n";
         i++;
         setTimeout(nextLine, line===""?600:1200);
       }
@@ -318,7 +318,7 @@ function finalScene(){
 
   const el=document.getElementById("letter");
   const img=document.getElementById("finalImage");
-  el.innerText="";
+  el.textContent="";
   img.style.opacity=0;
 
   setTimeout(()=>heartbeat(),2000);
