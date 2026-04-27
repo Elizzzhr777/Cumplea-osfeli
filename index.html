@@ -5,116 +5,69 @@
 <title>Pokémon Yon GBA</title>
 
 <style>
-body{
-  margin:0;
-  background:#000;
-  overflow:hidden;
-  font-family:monospace;
-}
-
-/* SCREEN */
-.screen{display:none;position:absolute;inset:0}
+body{ margin:0; background:#000; overflow:hidden; font-family:monospace; }
+.screen{display:none; position:absolute; inset:0}
 .screen.active{display:block}
 
-/* MENU */
+/* 1. MENU (GIF) */
 #menu{
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  height:100vh;
-  flex-direction:column;
-  color:white;
-  /* El GIF de fondo para la primera portada */
+  display:flex; justify-content:center; align-items:center; height:100vh; flex-direction:column; color:white;
   background: url('img-fondo1.gif') center/cover no-repeat;
 }
 
-#menu h1 {
-  background: rgba(0,0,0,0.6);
-  padding: 10px 20px;
-  border-radius: 8px;
-}
+#menu h1 { background: rgba(0,0,0,0.6); padding: 10px 20px; border-radius: 8px; }
 
-/* GAME */
+/* 2. GAME MAP (JPG) */
 #game{
-  position:relative;
-  width:100vw;
-  height:100vh;
-  /* GIF de fondo en la aventura */
-  background:url('img-fondo1.gif') center/cover no-repeat;
+  position:relative; width:100vw; height:100vh;
+  background: url('img-fondo1.jpg') center/cover no-repeat;
 }
 
 /* PLAYER */
 .player{
-  width:48px;
-  height:48px;
-  position:absolute;
-  background-size:contain;
-  background-repeat:no-repeat;
-  transform-origin:bottom center;
-  transition: transform 0.1s linear;
+  width:48px; height:48px; position:absolute;
+  background-size:contain; background-repeat:no-repeat;
 }
-
 #yon{background-image:url('Yon.png')}
 #pika{background-image:url('pikachu.png')}
 
-/* HUD */
-#hud{
-  position:absolute;
-  top:10px;
-  left:10px;
-  color:white;
-  background: rgba(0,0,0,0.5);
-  padding: 5px 10px;
-  border: 1px solid #fff;
-}
-
-/* BATTLE */
+/* 3. BATTLE (Pikachu GIF) */
 #battle{
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  flex-direction:column;
-  height:100vh;
-  color:white;
-  /* El GIF de Pikachu para la pantalla de batalla */
+  display:flex; justify-content:center; align-items:center; flex-direction:column; height:100vh; color:white;
   background: url('pikachu-pokemon.gif') center/cover no-repeat;
 }
 
-#battle h2 {
-    background: rgba(0,0,0,0.7);
-    padding: 10px;
-}
+#battle h2 { background: rgba(0,0,0,0.7); padding: 10px; border-radius: 8px;}
 
-/* FINAL */
+/* 4. FINAL SCENE (Carta con fondo Image-final.jpg) */
 #final{
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  flex-direction:column;
-  color:white;
-  height:100vh;
-  background: url('Image-final.jpg') center/cover no-repeat;
+  display:flex; justify-content:center; align-items:center; height:100vh;
+  background: url('Image-final.jpg') center/cover no-repeat; 
 }
 
 #letter{
-    white-space:pre-line;
-    background: rgba(0,0,0,0.8);
-    padding: 20px;
-    border-radius: 10px;
-    max-width: 80%;
-    max-height: 80vh;
-    overflow-y: auto;
+  background: rgba(0,0,0,0.8); /* Fondo oscuro semitransparente para leer bien */
+  width: 90%;
+  max-width: 500px;
+  padding: 40px;
+  box-sizing: border-box;
+  color: #fff; /* Texto blanco */
+  font-size: 16px;
+  white-space: pre-line;
+  border-radius: 15px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.8);
 }
 
-button {
-    padding: 10px 20px;
-    cursor: pointer;
-    font-family: monospace;
-    background: #000;
-    color: #fff;
-    border: 2px solid #fff;
-    margin: 5px;
+/* 5. TRAINER CARD (Pantalla Final) */
+#trainer{
+  display:none; justify-content:center; align-items:center; height:100vh;
+  background: url('Trainer-card.png') center/contain no-repeat #000;
 }
+#trainer.active { display:flex; }
+
+#hud{ position:absolute; top:10px; left:10px; color:white; background: rgba(0,0,0,0.7); padding: 5px 10px; border-radius: 5px; }
+button { padding: 10px 20px; cursor: pointer; font-family: monospace; background: #000; color: #fff; border: 2px solid #fff; margin: 5px; border-radius: 5px; }
+button:hover { background: #333; }
 </style>
 </head>
 
@@ -137,8 +90,8 @@ button {
 </div>
 
 <div id="battle" class="screen">
-  <h2>Batalla emo-cional</h2>
-  <button onclick="choice(2)">⚡ Amar x100pre</button>
+  <h2>¡Batalla emo-cional!</h2>
+  <button onclick="choice(999)">⚡ Amar x100pre</button>
   <button onclick="choice(1)">💛 Confiar</button>
   <button onclick="choice(-1)">💔 Dudar?</button>
 </div>
@@ -147,41 +100,23 @@ button {
   <div id="letter"></div>
 </div>
 
+<div id="trainer" class="screen"></div>
+
 <script>
-/* ========= CONFIG ========= */
 const TILE = 48;
+let mode="menu", love=0, grid = {x:4,y:2}, moving=false, trail=[];
+const yon = document.getElementById("yon"), pika = document.getElementById("pika");
 
-/* ========= STATE ========= */
-let mode="menu";
-let love=0;
-let grid = {x:4,y:2};
-let moving=false;
-let trail=[];
-
-/* ELEMENTS */
-const yon = document.getElementById("yon");
-const pika = document.getElementById("pika");
-
-/* ========= AUDIO HELPER ========= */
-function stopAllMusic() {
-    document.querySelectorAll('audio').forEach(audio => {
-        audio.pause();
-        audio.currentTime = 0;
-    });
-}
-
-function playMusic(id) {
-    stopAllMusic();
-    document.getElementById(id).play().catch(e => console.log("Audio waiting for interaction"));
-}
-
-/* ========= SCREEN ========= */
 function show(id){
   document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
   document.getElementById(id).classList.add("active");
 }
 
-/* ========= START ========= */
+function playMusic(id) {
+    document.querySelectorAll('audio').forEach(a => { a.pause(); a.currentTime = 0; });
+    document.getElementById(id).play().catch(e => {});
+}
+
 function startGame(){
   mode="game";
   show("game");
@@ -189,85 +124,48 @@ function startGame(){
   update();
 }
 
-/* ========= MOVEMENT ========= */
 document.addEventListener("keydown",e=>{
   if(mode!=="game" || moving) return;
-
-  let dx=0,dy=0;
-  if(e.key==="ArrowUp") dy=-1;
-  if(e.key==="ArrowDown") dy=1;
-  if(e.key==="ArrowLeft") dx=-1;
-  if(e.key==="ArrowRight") dx=1;
-
+  let dx=0, dy=0;
+  if(e.key==="ArrowUp") dy=-1; if(e.key==="ArrowDown") dy=1;
+  if(e.key==="ArrowLeft") dx=-1; if(e.key==="ArrowRight") dx=1;
   if(dx!==0 || dy!==0) move(dx,dy);
 });
 
 function move(dx,dy){
-  moving=true;
-  grid.x+=dx;
-  grid.y+=dy;
-
+  moving=true; grid.x+=dx; grid.y+=dy;
   animateMove(()=>{
-    if(grid.y > 6) encounter();
+    if(grid.y > 6 && Math.random()<0.3) startBattle();
     moving=false;
   });
 }
 
 function animateMove(cb){
-  let startX = yon.offsetLeft;
-  let startY = yon.offsetTop;
-  let endX = grid.x*TILE;
-  let endY = grid.y*TILE;
-  let t=0;
-
+  let startX=yon.offsetLeft, startY=yon.offsetTop, endX=grid.x*TILE, endY=grid.y*TILE, t=0;
   function step(){
     t+=0.1;
-    let x = startX + (endX-startX)*t;
-    let y = startY + (endY-startY)*t;
-
-    yon.style.left = x+"px";
-    yon.style.top = y+"px";
-
+    yon.style.left = (startX + (endX-startX)*t)+"px";
+    yon.style.top = (startY + (endY-startY)*t)+"px";
     let target = trail[trail.length-1] || {x:startX, y:startY};
-    let px = parseFloat(pika.style.left)||x;
-    let py = parseFloat(pika.style.top)||y;
-
-    px += (target.x - px)*0.2;
-    py += (target.y - py)*0.2;
-
-    pika.style.left = px+"px";
-    pika.style.top = py+"px";
-
+    pika.style.left = (parseFloat(pika.style.left||startX) + (target.x - parseFloat(pika.style.left||startX))*0.2)+"px";
+    pika.style.top = (parseFloat(pika.style.top||startY) + (target.y - parseFloat(pika.style.top||startY))*0.2)+"px";
     if(t<1) requestAnimationFrame(step);
-    else {
-      trail.push({x:endX,y:endY});
-      if(trail.length>5) trail.shift();
-      if(cb) cb();
-    }
+    else { trail.push({x:endX,y:endY}); if(trail.length>5) trail.shift(); if(cb) cb(); }
   }
   step();
 }
 
-function encounter(){
-  if(Math.random()<0.3) startBattle();
-}
-
-function startBattle(){
-  mode="battle";
-  show("battle");
-  playMusic("music_battle");
-}
+function startBattle(){ mode="battle"; show("battle"); playMusic("music_battle"); }
 
 function choice(v){
-  love+=v;
-  document.getElementById("love").textContent=love;
-
-  if(love>=10){
+  // Si presiona "Amar x100pre" (valor 999), vamos directo a la carta
+  if(v === 999) {
     finalScene();
-  }else{
-    mode="game";
-    show("game");
-    playMusic("music_game");
+  } else {
+    // Si presiona otra cosa, suma puntos y regresa al mapa
+    love+=v;
+    document.getElementById("love").textContent=love;
+    mode="game"; show("game"); playMusic("music_game");
   }
 }
 
@@ -275,45 +173,33 @@ function finalScene(){
   mode="final";
   show("final");
   playMusic("music_final");
-
-  document.getElementById("letter").textContent = `
-Hola Yon... ♥
-
-Feliz cumpleaños.
-
-Pensé en escribirte algo súper profundo...
-pero ya sabes que lo mío no es ser cursi.
-
-Así que bueno, lo intentaré jiji
-
-Te amooo.
-
-Pero, sobre todo...
-te respeto.
-y te admiro muchísimo.
-
-Admiro tu capacidad para soportarme kjjsj...
-
-y la persona increíble que eres.
-
-Aún cuando todo se pone difícil...
-
-yo sigo eligiéndote.
-`;
+  
+  const text = `Hola Yon... ♥\n\nFeliz cumpleaños.\n\nPensé en escribirte algo súper profundo...\npero ya sabes que lo mío no es ser cursi.\n\nAsí que bueno, lo intentaré jiji\n\nTe amooo.\n\nPero, sobre todo...\nte respeto.\ny te admiro muchísimo.\n\nAdmiro tu capacidad para soportarme kjjsj...\ny la persona increíble que eres.\n\nAún cuando todo se pone difícil...\nyo sigo eligiéndote.\n\nDai. 🌸`;
+  let i = 0;
+  const el = document.getElementById("letter");
+  el.textContent = "";
+  
+  const typing = setInterval(() => {
+    el.textContent += text[i];
+    i++;
+    if(i >= text.length) {
+      clearInterval(typing);
+      
+      // Una vez que termina la carta, espera 5 segundos y muestra la Trainer Card
+      setTimeout(() => {
+        mode="trainer";
+        show("trainer");
+      }, 5000); 
+    }
+  }, 50); // Velocidad de las letras
 }
 
 function update(){
-  yon.style.left = grid.x*TILE+"px";
-  yon.style.top = grid.y*TILE+"px";
-  pika.style.left = (grid.x*TILE-48)+"px";
-  pika.style.top = (grid.y*TILE)+"px";
+  yon.style.left = grid.x*TILE+"px"; yon.style.top = grid.y*TILE+"px";
+  pika.style.left = (grid.x*TILE-48)+"px"; pika.style.top = (grid.y*TILE)+"px";
 }
 
-// Iniciar música de menú al primer clic
-window.addEventListener('click', () => {
-    if(mode === "menu") document.getElementById("music_menu").play();
-}, {once: true});
-
+window.addEventListener('click', () => { if(mode === "menu") playMusic("music_menu"); }, {once: true});
 </script>
 </body>
 </html>
