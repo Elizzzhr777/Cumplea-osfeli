@@ -2,72 +2,53 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Pokémon Yon GBA</title>
+<title>Pokémon Yon - Versión Final</title>
 
 <style>
-body{ margin:0; background:#000; overflow:hidden; font-family:monospace; }
-.screen{display:none; position:absolute; inset:0}
-.screen.active{display:block}
+/* ⚙️ SISTEMA BASE */
+body { margin: 0; background: #000; color: #fff; font-family: monospace; overflow: hidden; }
+.screen { display: none; width: 100vw; height: 100vh; position: absolute; top: 0; left: 0; }
 
-/* 1. MENU (GIF) */
-#menu{
-  display:flex; justify-content:center; align-items:center; height:100vh; flex-direction:column; color:white;
+/* 🎮 1. MENU (GIF FONDO 1) */
+#menu {
+  flex-direction: column; justify-content: center; align-items: center;
   background: url('img-fondo1.gif') center/cover no-repeat;
 }
+#menu h1 { background: rgba(0,0,0,0.8); padding: 15px 30px; border-radius: 10px; border: 2px solid #fff; text-align: center; }
 
-#menu h1 { background: rgba(0,0,0,0.6); padding: 10px 20px; border-radius: 8px; }
+/* 🗺️ 2. GAME MAP (JPG FONDO 1) */
+#game { background: url('img-fondo1.jpg') center/cover no-repeat; }
+.player { width: 48px; height: 48px; position: absolute; background-size: contain; background-repeat: no-repeat; z-index: 5;}
+#yon { background-image: url('Yon.png'); }
+#pika { background-image: url('pikachu.png'); }
+#hud { position: absolute; top: 15px; left: 15px; background: rgba(0,0,0,0.8); padding: 10px; border: 1px solid #fff; border-radius: 5px; z-index: 10; font-size: 16px; }
 
-/* 2. GAME MAP (JPG) */
-#game{
-  position:relative; width:100vw; height:100vh;
-  background: url('img-fondo1.jpg') center/cover no-repeat;
-}
-
-/* PLAYER */
-.player{
-  width:48px; height:48px; position:absolute;
-  background-size:contain; background-repeat:no-repeat;
-}
-#yon{background-image:url('Yon.png')}
-#pika{background-image:url('pikachu.png')}
-
-/* 3. BATTLE (Pikachu GIF) */
-#battle{
-  display:flex; justify-content:center; align-items:center; flex-direction:column; height:100vh; color:white;
+/* ⚔️ 3. BATTLE (GIF PIKACHU) */
+#battle {
+  flex-direction: column; justify-content: center; align-items: center;
   background: url('pikachu-pokemon.gif') center/cover no-repeat;
 }
+#battle h2 { background: rgba(0,0,0,0.8); padding: 15px; border-radius: 10px; border: 1px solid #fff; margin-bottom: 20px; text-align: center; }
+.btn-container { display: flex; flex-direction: column; gap: 10px; width: 80%; max-width: 300px; }
 
-#battle h2 { background: rgba(0,0,0,0.7); padding: 10px; border-radius: 8px;}
-
-/* 4. FINAL SCENE (Carta con fondo Image-final.jpg) */
-#final{
-  display:flex; justify-content:center; align-items:center; height:100vh;
-  background: url('Image-final.jpg') center/cover no-repeat; 
+/* 💌 4. FINAL SCENE (FOTO FINAL + CARTA OSCURA) */
+#final {
+  justify-content: center; align-items: center;
+  background: url('Image-final.jpg') center/cover no-repeat;
+}
+#letter {
+  background: rgba(0,0,0,0.85); /* Fondo muy oscuro para que la letra resalte sí o sí */
+  width: 85%; max-width: 600px; min-height: 200px; padding: 30px;
+  border: 2px solid #fff; border-radius: 10px; font-size: 16px; line-height: 1.6;
+  white-space: pre-wrap; box-shadow: 0 0 30px rgba(0,0,0,0.9);
 }
 
-#letter{
-  background: rgba(0,0,0,0.8); /* Fondo oscuro semitransparente para leer bien */
-  width: 90%;
-  max-width: 500px;
-  padding: 40px;
-  box-sizing: border-box;
-  color: #fff; /* Texto blanco */
-  font-size: 16px;
-  white-space: pre-line;
-  border-radius: 15px;
-  box-shadow: 0 0 20px rgba(0,0,0,0.8);
-}
+/* 🏆 5. TRAINER CARD (CIERRE) */
+#trainer { background: url('Trainer-card.png') center/contain no-repeat #000; }
 
-/* 5. TRAINER CARD (Pantalla Final) */
-#trainer{
-  display:none; justify-content:center; align-items:center; height:100vh;
-  background: url('Trainer-card.png') center/contain no-repeat #000;
-}
-#trainer.active { display:flex; }
-
-#hud{ position:absolute; top:10px; left:10px; color:white; background: rgba(0,0,0,0.7); padding: 5px 10px; border-radius: 5px; }
-button { padding: 10px 20px; cursor: pointer; font-family: monospace; background: #000; color: #fff; border: 2px solid #fff; margin: 5px; border-radius: 5px; }
-button:hover { background: #333; }
+/* 🖲️ BOTONES GLOBALES */
+button { padding: 12px 24px; cursor: pointer; font-family: inherit; font-size: 16px; font-weight: bold; background: #000; color: #fff; border: 2px solid #fff; border-radius: 8px; transition: 0.2s; }
+button:hover { background: #fff; color: #000; transform: scale(1.05); }
 </style>
 </head>
 
@@ -78,22 +59,24 @@ button:hover { background: #333; }
 <audio id="music_battle" src="gone.mp3" loop></audio>
 <audio id="music_final" src="extra.mp3" loop></audio>
 
-<div id="menu" class="screen active">
+<div id="menu" class="screen" style="display: flex;">
   <h1>POKÉMON YON</h1>
   <button onclick="startGame()">Nueva Aventura</button>
 </div>
 
 <div id="game" class="screen">
+  <div id="hud">Amor: <span id="love">0</span></div>
   <div id="yon" class="player"></div>
   <div id="pika" class="player"></div>
-  <div id="hud">Amor: <span id="love">0</span></div>
 </div>
 
 <div id="battle" class="screen">
   <h2>¡Batalla emo-cional!</h2>
-  <button onclick="choice(999)">⚡ Amar x100pre</button>
-  <button onclick="choice(1)">💛 Confiar</button>
-  <button onclick="choice(-1)">💔 Dudar?</button>
+  <div class="btn-container">
+    <button onclick="choice(999)">⚡ Amar x100pre</button>
+    <button onclick="choice(1)">💛 Confiar</button>
+    <button onclick="choice(-1)">💔 Dudar?</button>
+  </div>
 </div>
 
 <div id="final" class="screen">
@@ -103,103 +86,169 @@ button:hover { background: #333; }
 <div id="trainer" class="screen"></div>
 
 <script>
+/* =========================================
+   ⚙️ MOTOR PRINCIPAL DEL JUEGO
+   ========================================= */
 const TILE = 48;
-let mode="menu", love=0, grid = {x:4,y:2}, moving=false, trail=[];
-const yon = document.getElementById("yon"), pika = document.getElementById("pika");
+let mode = "menu", love = 0, moving = false;
+let grid = { x: 4, y: 2 };
+let trail = [];
 
-function show(id){
-  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
-  document.getElementById(id).classList.add("active");
+const yon = document.getElementById("yon");
+const pika = document.getElementById("pika");
+
+/* --- 🔄 SISTEMA DE PANTALLAS A PRUEBA DE FALLOS --- */
+function switchScreen(screenId) {
+  // 1. Apagamos todas las pantallas de forma estricta
+  document.getElementById("menu").style.display = "none";
+  document.getElementById("game").style.display = "none";
+  document.getElementById("battle").style.display = "none";
+  document.getElementById("final").style.display = "none";
+  document.getElementById("trainer").style.display = "none";
+
+  // 2. Encendemos solo la que necesitamos con el Display correcto
+  if (screenId === "game" || screenId === "trainer") {
+    document.getElementById(screenId).style.display = "block";
+  } else {
+    document.getElementById(screenId).style.display = "flex";
+  }
+  mode = screenId;
 }
 
+/* --- 🎵 GESTOR DE AUDIO --- */
 function playMusic(id) {
-    document.querySelectorAll('audio').forEach(a => { a.pause(); a.currentTime = 0; });
-    document.getElementById(id).play().catch(e => {});
+  document.querySelectorAll('audio').forEach(a => { a.pause(); a.currentTime = 0; });
+  const audio = document.getElementById(id);
+  if(audio) audio.play().catch(e => console.log("Esperando interacción del usuario"));
 }
 
-function startGame(){
-  mode="game";
-  show("game");
+/* --- 🚀 INICIO DEL JUEGO --- */
+function startGame() {
+  switchScreen("game");
   playMusic("music_game");
-  update();
+  updatePositions();
 }
 
-document.addEventListener("keydown",e=>{
-  if(mode!=="game" || moving) return;
-  let dx=0, dy=0;
-  if(e.key==="ArrowUp") dy=-1; if(e.key==="ArrowDown") dy=1;
-  if(e.key==="ArrowLeft") dx=-1; if(e.key==="ArrowRight") dx=1;
-  if(dx!==0 || dy!==0) move(dx,dy);
+/* --- 🕹️ CONTROLES Y MOVIMIENTO --- */
+document.addEventListener("keydown", e => {
+  if (mode !== "game" || moving) return;
+  let dx = 0, dy = 0;
+  
+  if (e.key === "ArrowUp") dy = -1;
+  if (e.key === "ArrowDown") dy = 1;
+  if (e.key === "ArrowLeft") dx = -1;
+  if (e.key === "ArrowRight") dx = 1;
+
+  if (dx !== 0 || dy !== 0) movePlayer(dx, dy);
 });
 
-function move(dx,dy){
-  moving=true; grid.x+=dx; grid.y+=dy;
-  animateMove(()=>{
-    if(grid.y > 6 && Math.random()<0.3) startBattle();
-    moving=false;
+function movePlayer(dx, dy) {
+  moving = true;
+  grid.x += dx;
+  grid.y += dy;
+
+  animateMovement(() => {
+    // Entrar en batalla al pisar hierba (Y mayor a 6)
+    if (grid.y > 6 && Math.random() < 0.3) {
+      startBattle();
+    }
+    moving = false;
   });
 }
 
-function animateMove(cb){
-  let startX=yon.offsetLeft, startY=yon.offsetTop, endX=grid.x*TILE, endY=grid.y*TILE, t=0;
-  function step(){
-    t+=0.1;
-    yon.style.left = (startX + (endX-startX)*t)+"px";
-    yon.style.top = (startY + (endY-startY)*t)+"px";
-    let target = trail[trail.length-1] || {x:startX, y:startY};
-    pika.style.left = (parseFloat(pika.style.left||startX) + (target.x - parseFloat(pika.style.left||startX))*0.2)+"px";
-    pika.style.top = (parseFloat(pika.style.top||startY) + (target.y - parseFloat(pika.style.top||startY))*0.2)+"px";
-    if(t<1) requestAnimationFrame(step);
-    else { trail.push({x:endX,y:endY}); if(trail.length>5) trail.shift(); if(cb) cb(); }
+function animateMovement(callback) {
+  let startX = yon.offsetLeft, startY = yon.offsetTop;
+  let endX = grid.x * TILE, endY = grid.y * TILE;
+  let t = 0;
+
+  function step() {
+    t += 0.15; // Velocidad de caminata
+    if (t > 1) t = 1;
+
+    yon.style.left = (startX + (endX - startX) * t) + "px";
+    yon.style.top = (startY + (endY - startY) * t) + "px";
+
+    let target = trail[trail.length - 1] || { x: startX, y: startY };
+    let pX = parseFloat(pika.style.left || startX);
+    let pY = parseFloat(pika.style.top || startY);
+
+    pika.style.left = (pX + (target.x - pX) * 0.2) + "px";
+    pika.style.top = (pY + (target.y - pY) * 0.2) + "px";
+
+    if (t < 1) {
+      requestAnimationFrame(step);
+    } else {
+      trail.push({ x: endX, y: endY });
+      if (trail.length > 5) trail.shift();
+      if (callback) callback();
+    }
   }
   step();
 }
 
-function startBattle(){ mode="battle"; show("battle"); playMusic("music_battle"); }
+function updatePositions() {
+  yon.style.left = grid.x * TILE + "px";
+  yon.style.top = grid.y * TILE + "px";
+  pika.style.left = (grid.x * TILE - 48) + "px";
+  pika.style.top = (grid.y * TILE) + "px";
+}
 
-function choice(v){
-  // Si presiona "Amar x100pre" (valor 999), vamos directo a la carta
-  if(v === 999) {
-    finalScene();
+/* --- ⚔️ SISTEMA DE BATALLA --- */
+function startBattle() {
+  switchScreen("battle");
+  playMusic("music_battle");
+}
+
+function choice(value) {
+  if (value === 999) {
+    // Va directo al final si elige "Amar x100pre"
+    triggerFinalSequence();
   } else {
-    // Si presiona otra cosa, suma puntos y regresa al mapa
-    love+=v;
-    document.getElementById("love").textContent=love;
-    mode="game"; show("game"); playMusic("music_game");
+    // Vuelve al mapa si elige otra cosa
+    love += value;
+    document.getElementById("love").textContent = love;
+    switchScreen("game");
+    playMusic("music_game");
   }
 }
 
-function finalScene(){
-  mode="final";
-  show("final");
+/* --- 💌 SECUENCIA FINAL Y MÁQUINA DE ESCRIBIR --- */
+function triggerFinalSequence() {
+  switchScreen("final");
   playMusic("music_final");
   
   const text = `Hola Yon... ♥\n\nFeliz cumpleaños.\n\nPensé en escribirte algo súper profundo...\npero ya sabes que lo mío no es ser cursi.\n\nAsí que bueno, lo intentaré jiji\n\nTe amooo.\n\nPero, sobre todo...\nte respeto.\ny te admiro muchísimo.\n\nAdmiro tu capacidad para soportarme kjjsj...\ny la persona increíble que eres.\n\nAún cuando todo se pone difícil...\nyo sigo eligiéndote.\n\nDai. 🌸`;
-  let i = 0;
-  const el = document.getElementById("letter");
-  el.textContent = "";
   
-  const typing = setInterval(() => {
-    el.textContent += text[i];
+  const letterBox = document.getElementById("letter");
+  letterBox.textContent = ""; // Limpiamos la caja
+  let i = 0;
+  
+  // Borramos cualquier intervalo previo por seguridad
+  if(window.typeWriter) clearInterval(window.typeWriter);
+  
+  window.typeWriter = setInterval(() => {
+    letterBox.textContent += text.charAt(i);
     i++;
-    if(i >= text.length) {
-      clearInterval(typing);
+    
+    // Cuando termina de escribir toda la carta
+    if (i >= text.length) {
+      clearInterval(window.typeWriter);
       
-      // Una vez que termina la carta, espera 5 segundos y muestra la Trainer Card
+      // Espera 6 segundos exactos para que lea, y pasa a la Trainer Card
       setTimeout(() => {
-        mode="trainer";
-        show("trainer");
-      }, 5000); 
+        switchScreen("trainer");
+      }, 6000);
     }
-  }, 50); // Velocidad de las letras
+  }, 45); // Velocidad de la letra (45ms)
 }
 
-function update(){
-  yon.style.left = grid.x*TILE+"px"; yon.style.top = grid.y*TILE+"px";
-  pika.style.left = (grid.x*TILE-48)+"px"; pika.style.top = (grid.y*TILE)+"px";
-}
+/* Asegurar que la primera vez que hace clic en la web inicie la música del menú */
+window.addEventListener('click', () => { 
+  if (mode === "menu" && document.getElementById("music_menu").paused) {
+    playMusic("music_menu"); 
+  }
+}, { once: true });
 
-window.addEventListener('click', () => { if(mode === "menu") playMusic("music_menu"); }, {once: true});
 </script>
 </body>
 </html>
