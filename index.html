@@ -6,9 +6,7 @@
 <title>Pokémon Yon — Inolvidable 💛</title>
 
 <style>
-:root{
-  --ui:#ffffff;
-}
+:root{ --ui:#ffffff; }
 *{box-sizing:border-box}
 body{margin:0;background:#000;color:#fff;font-family:monospace;overflow:hidden}
 
@@ -40,47 +38,28 @@ button{
 /* DIALOG */
 #dialog{
   position:fixed;bottom:0;width:100%;background:#000;padding:16px;display:none;
-  border-top:2px solid var(--ui);line-height:1.5
+  border-top:2px solid var(--ui);line-height:1.5;cursor:pointer;
 }
 
 /* BATTLE */
 #battle{
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  gap:10px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;
   background:url('img-fondo1.gif')center/cover no-repeat;
-  width: 100%;
-  height: 100vh;
+  width:100%;height:100vh;
 }
 
 /* FADE */
-#fade{
-  position:fixed;inset:0;background:#000;opacity:0;pointer-events:none;transition:0.8s;z-index:999
-}
+#fade{position:fixed;inset:0;background:#000;opacity:0;pointer-events:none;transition:0.8s;z-index:999}
 
 /* CINEMATIC */
 #cinematic{position:relative;width:100%;height:100%;overflow:hidden;background:#000}
 #particles{position:absolute;inset:0;z-index:1}
-#letterBox{
-  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:2;padding:20px
-}
+#letterBox{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:2;padding:20px}
 #letter{
-  background:rgba(0,0,0,0.7);
-  padding:30px;
-  max-width:650px;
-  white-space:pre-line;
-  text-align:center;
-  border:1px solid rgba(255,255,255,0.2);
-  backdrop-filter:blur(6px);
-  line-height:1.6;
-  font-size:14px;
+  background:rgba(0,0,0,0.7);padding:30px;max-width:650px;white-space:pre-line;text-align:center;
+  border:1px solid rgba(255,255,255,0.2);backdrop-filter:blur(6px);line-height:1.6;font-size:14px;
 }
-#finalImage{
-  position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
-  opacity:0;transition:2.5s;z-index:0;
-}
+#finalImage{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:2.5s;z-index:0}
 
 /* HEARTBEAT */
 #heartbeat{
@@ -124,9 +103,7 @@ button{
 <div id="final" class="screen">
   <div id="cinematic">
     <canvas id="particles"></canvas>
-    <div id="letterBox">
-      <div id="letter"></div>
-    </div>
+    <div id="letterBox"><div id="letter"></div></div>
     <img id="finalImage" src="Image-final.jpg" alt="recuerdo">
     <div id="heartbeat"></div>
   </div>
@@ -156,7 +133,7 @@ const a1 = document.getElementById("a1");
 const a2 = document.getElementById("a2");
 const a3 = document.getElementById("a3");
 const a4 = document.getElementById("a4");
-  const tracks = [a1,a2,a3,a4];
+const tracks = [a1,a2,a3,a4];
 function play(a){
   tracks.forEach(t=>{t.pause(); t.volume=1});
   a.currentTime=0;
@@ -172,7 +149,7 @@ function newGame(){
 function loadGame(){ startGame(); }
 
 /* ===== GAME ===== */
-let pos={x:200,y:100};
+let pos={x:200,y:50};
 let trail=[];
 let lock=false;
 
@@ -182,46 +159,40 @@ function startGame(){
   updateHUD();
   draw();
   setTimeout(()=>{
-  showText([
-    "¡Hola Mi Vidam<3!",
-    "Bienvenido a esta pequeña aventura.",
-    "Camina hacia el pasto alto (abajo) para encontrar algo especial...",
-    "Usa las flechas del teclado para moverte."
+    showText([
+      "¡Hola Mi Vidam<3!",
+      "Bienvenido a esta pequeña aventura.",
+      "Camina hacia el pasto alto (abajo) para encontrar algo especial...",
+      "Usa las flechas del teclado para moverte."
     ]);
-}, 1000);
-dialog.onclick = next;}
-  
+  },1000);
+}
 
 function draw(){
   yon.style.left=pos.x+"px";
   yon.style.top=pos.y+"px";
-
   trail.push({...pos});
   if(trail.length>10) trail.shift();
   let t=trail[0]||pos;
-
   pika.style.left=t.x+"px";
   pika.style.top=t.y+"px";
 }
 
 document.addEventListener("keydown",e=>{
   if(lock) return;
-
   if(e.key==="ArrowUp") pos.y-=5;
   if(e.key==="ArrowDown") pos.y+=5;
   if(e.key==="ArrowLeft") pos.x-=5;
   if(e.key==="ArrowRight") pos.x+=5;
-
   pos.x=Math.max(0,Math.min(window.innerWidth-48,pos.x));
   pos.y=Math.max(0,Math.min(window.innerHeight-48,pos.y));
-
   draw();
   check();
 });
 
 /* ===== EVENTS ===== */
 function check(){
-  if(pos.y>window.innerHeight*0.7 && Math.random()<0.05){
+  if(pos.y>window.innerHeight*0.7 && Math.random()<0.2){ // probabilidad más alta
     startBattle();
   }
 }
@@ -230,7 +201,6 @@ function check(){
 function showText(arr,cb){
   dialog.style.display="block";
   let i=0; lock=true;
-
   function next(){
     if(i>=arr.length){
       dialog.style.display="none";
@@ -241,8 +211,8 @@ function showText(arr,cb){
     dialog.innerText=arr[i];
     i++;
   }
-
   document.onkeydown=(e)=>{ if(e.key==="Enter") next(); };
+  dialog.onclick = next; // avanzar también con clic
   next();
 }
 
@@ -251,180 +221,22 @@ function startBattle(){
   show("battle");
   play(a3);
 }
-
 function choice(v){
   state.love+=v;
   save();
   updateHUD();
   show("game");
-  if(state.love >=10){
-    setTimeout(finalScene, 1000);
-  }
+  if(state.love>=10){ setTimeout(finalScene,1000); }
 }
 
 /* ===== PARTICLES ===== */
-const canvas = document.getElementById("particles");
-const ctx = canvas.getContext("2d");
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
-
+const canvas=document.getElementById("particles");
+const ctx=canvas.getContext("2d");
+canvas.width=window.innerWidth;
+canvas.height=window.innerHeight;
 let particles=[];
 for(let i=0;i<70;i++){
-  particles.push({
-    x:Math.random()*canvas.width,
-    y:Math.random()*canvas.height,
-    r:Math.random()*2,
-    v:Math.random()*0.4
-  });
+  particles.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,r:Math.random()*2,v:Math.random()*0.4});
 }
-
 function animateParticles(){
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  particles.forEach(p=>{
-    p.y -= p.v;
-    if(p.y<0) p.y = canvas.height;
-    ctx.beginPath();
-    ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-    ctx.fillStyle="rgba(255,255,255,0.5)";
-    ctx.fill();
-  });
-  requestAnimationFrame(animateParticles);
-}
-
-/* ===== HEARTBEAT ===== */
-function heartbeat(){
-  let hb=document.getElementById("heartbeat");
-  let i=0;
-  let beat=setInterval(()=>{
-    hb.style.opacity = (i%2===0)?0.25:0;
-    i++;
-    if(i>12) clearInterval(beat);
-  },300);
-}
-
-/* ===== TYPEWRITER ===== */
-function typeSequence(lines, cb){
-  let i=0;
-  const el=document.getElementById("letter");
-
-  function nextLine(){
-    if(i>=lines.length){
-      if(cb) cb();
-      return;
-    }
-    let line=lines[i];
-    let j=0;
-
-    let typing=setInterval(()=>{
-      el.textContent+=line[j]||"";
-      j++;
-      if(j>line.length){
-        clearInterval(typing);
-        el.textContent+="\n";
-        i++;
-        setTimeout(nextLine, line===""?600:1200);
-      }
-    },30);
-  }
-  nextLine();
-}
-
-/* ===== FINAL CINEMATIC ===== */
-function finalScene(){
-  show("final");
-  animateParticles();
-  play(a4);
-
-  const el=document.getElementById("letter");
-  const img=document.getElementById("finalImage");
-  el.textContent="";
-  img.style.opacity=0;
-
-  setTimeout(()=>heartbeat(),2000);
-
-  const lines=[
-    "Hola Yon... ♥",
-    "",
-    "Feliz cumpleaños.",
-    "",
-    "Pensé en escribirte algo súper profundo...",
-    "pero ya sabes que lo mío no es ser cursi.",
-    "",
-    "Así que bueno, lo intentaré jiji",
-    "",
-    "Te amooo.",
-    "",
-    "Pero, sobre todo...",
-    "te respeto.",
-    "y te admiro muchísimo.",
-    "",
-    "Admiro tu capacidad para soportarme kjjsj...",
-    "",
-    "y la persona increíble que eres.",
-    "",
-    "Aún cuando todo se pone difícil...",
-    "",
-    "yo sigo eligiéndote.",
-    "",
-    "..."
-  ];
-
-  typeSequence(lines,()=>{
-    setTimeout(finalPart2,2000);
-  });
-}
-
-function finalPart2(){
-  play(a2);
-
-  const el=document.getElementById("letter");
-  const img=document.getElementById("finalImage");
-
-  const lines2=[
-    "",
-    "Disfruta tu día.",
-    "",
-    "Te lo mereces.",
-    "",
-    "Por ser quien eres...",
-    "",
-    "y por tener la suerte...",
-    "de tenerme a mí como regalo.",
-    "",
-    "(jijiji)",
-    "",
-    "",
-    "Pero si soy honesta...",
-    "",
-    "el regalo eres tú.",
-    "",
-    "Y tenerte en mi vida...",
-    "es de las cosas más bonitas que me han pasado.",
-    "",
-    "",
-    "Feliz cumpleaños, Yon.",
-    "",
-    "Te amo muchísimo.",
-    "",
-    "Dai. 🌸"
-  ];
-
-  typeSequence(lines2,()=>{
-    setTimeout(()=>{
-      img.style.opacity=0.35;
-    },1200);
-  });
-}
-
-/* START */
-function updateHUD(){
-  const loveEl = document.getElementById("love");
-  if(loveEl) loveEl.textContent = state.love;
-}
-  window.onload = () => {
-  show("menu");
-  updateHUD();
-  };
-</script>
-</body>
-</html>
+  ctx.clearRect(0,0,canvas
