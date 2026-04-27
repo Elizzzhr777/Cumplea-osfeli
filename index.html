@@ -162,7 +162,7 @@ function newGame(){
 function loadGame(){ startGame(); }
 
 /* ===== GAME ===== */
-let pos={x:200,y:200};
+let pos={x:200,y:50};
 let trail=[];
 let lock=false;
 
@@ -210,7 +210,7 @@ document.addEventListener("keydown",e=>{
 
 /* ===== EVENTS ===== */
 function check(){
-  if(pos.y>window.innerHeight*0.7 && Math.random()<0.02){
+  if(pos.y>window.innerHeight*0.7 && Math.random()<0.005){
     startBattle();
   }
 }
@@ -244,7 +244,6 @@ function startBattle(){
 function choice(v){
   state.love+=v;
   save();
-  finalScene();
 }
 
 function updateHUD(){
