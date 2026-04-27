@@ -152,7 +152,10 @@ function show(id){
 }
 
 /* ===== AUDIO ===== */
-const tracks=[a1,a2,a3,a4];
+const a1 = document.getElementById("a1");
+const a2 = document.getElementById("a2");
+const a3 = document.getElementById("a3");
+const a4 = document.getElementById("a4");
 function play(a){
   tracks.forEach(t=>{t.pause(); t.volume=1});
   a.currentTime=0;
@@ -416,8 +419,8 @@ function finalPart2(){
 
 /* START */
 function updateHUD(){
-  const loveEl =document.getElementalByld("love");
-  if(loveEl) loveEl.textContent =state.love;
+  const loveEl = document.getElementByld("love");
+  if(loveEl) loveEl.textContent = state.love;
 }
   show("menu");
   updateHUD();
