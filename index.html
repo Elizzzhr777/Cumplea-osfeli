@@ -6,14 +6,24 @@
 
 <style>
 body { margin: 0; background: #000; color: #fff; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
-.screen { display: none; width: 100vw; height: 100vh; position: absolute; inset: 0; animation: fadeIn 0.8s ease; }
+
+/* 🌟 Glow global */
+.screen {
+  display: none;
+  width: 100vw;
+  height: 100vh;
+  position: absolute;
+  inset: 0;
+  animation: fadeIn 0.8s ease;
+  box-shadow: inset 0 0 25px rgba(255,203,5,0.4), inset 0 0 60px rgba(42,117,187,0.2);
+}
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: scale(1.05); }
+  from { opacity: 0; transform: scale(1.03); }
   to { opacity: 1; transform: scale(1); }
 }
 
-/* MENÚ Y MAPA */
+/* MENÚ */
 #menu, #level-select {
   flex-direction: column; justify-content: center; align-items: center;
   background: url('img-fondo1.gif') center/cover no-repeat;
@@ -22,115 +32,129 @@ body { margin: 0; background: #000; color: #fff; font-family: 'Segoe UI', sans-s
 h1 {
   animation: glowText 2s infinite alternate;
 }
-
 @keyframes glowText {
   from { text-shadow: 0 0 10px #fff; }
   to { text-shadow: 0 0 25px #ffcb05, 0 0 35px #2a75bb; }
 }
 
 .level-btn {
-  width: 350px; display: flex; align-items: center; justify-content: flex-start; gap: 15px;
-  margin-bottom: 15px; background: rgba(0,0,0,0.8); color: #ffcb05; 
-  border: 2px solid #ffcb05; padding: 10px; border-radius: 15px; transition: 0.3s;
+  width: 350px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 15px;
+  background: rgba(0,0,0,0.8);
+  color: #ffcb05;
+  border: 2px solid #ffcb05;
+  padding: 10px;
+  border-radius: 15px;
+  transition: 0.3s;
 }
-.level-btn:hover { transform: scale(1.05); box-shadow: 0 0 15px #ffcb05; }
+.level-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 15px #ffcb05;
+}
 
-.level-btn img { width: 40px; height: 40px; object-fit: contain; }
-.locked { opacity: 0.5; filter: grayscale(100%); cursor: not-allowed; pointer-events: none; }
+.locked { opacity: 0.5; filter: grayscale(100%); pointer-events: none; }
 
 /* PLAYLIST */
 #playlist-screen {
   flex-direction: column; justify-content: center; align-items: center;
   background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('img-fondo1.gif') center/cover no-repeat;
 }
-.playlist-container {
-  background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px);
-  padding: 30px; border-radius: 25px; border: 3px solid #ffcb05;
-  width: 80%; max-width: 450px; text-align: center;
-}
+
 .song-item {
-  background: rgba(0, 0, 0, 0.6); margin: 10px 0; padding: 15px;
-  border-radius: 15px; cursor: pointer; border: 1px solid transparent;
-  transition: 0.2s; display: flex; align-items: center; justify-content: space-between;
+  background: rgba(0, 0, 0, 0.6);
+  margin: 10px 0;
+  padding: 15px;
+  border-radius: 15px;
+  cursor: pointer;
+  transition: 0.2s;
 }
-.song-item:hover { transform: translateX(5px) scale(1.03); border-color: #ffcb05; background: rgba(42, 117, 187, 0.4); }
-.song-item.active { background: #2a75bb; border-color: #fff; }
+.song-item:hover {
+  transform: translateX(5px) scale(1.03);
+  box-shadow: 0 0 10px #ffcb05;
+}
 
 /* TRANSICIÓN */
 #level-transition {
   flex-direction: column; justify-content: center; align-items: center;
-  background: rgba(0,0,0,0.9); z-index: 200;
+  background: rgba(0,0,0,0.9);
 }
 .transition-box {
-  background: #111; padding: 40px; border-radius: 20px; border: 3px solid #4CAF50;
-  text-align: center; animation: pulse 1.5s infinite;
+  padding: 40px;
+  border-radius: 20px;
+  border: 3px solid #4CAF50;
+  animation: pulse 1.5s infinite;
 }
 @keyframes pulse {
-  0% { box-shadow: 0 0 10px #4CAF50; }
   50% { box-shadow: 0 0 30px #4CAF50; }
-  100% { box-shadow: 0 0 10px #4CAF50; }
 }
 
 /* BATALLA */
-#battle { 
-    flex-direction: column; justify-content: center; align-items: center; 
-    background: url('pikachu-pokemon.gif') center/cover no-repeat; 
-}
-#battle button:hover {
-  transform: scale(1.1);
-  box-shadow: 0 0 20px #ffcb05;
+#battle {
+  flex-direction: column; justify-content: center; align-items: center;
+  background: url('pikachu-pokemon.gif') center/cover no-repeat;
 }
 
 /* FINAL */
-#final { 
-    justify-content: center; align-items: center; 
-    background: url('Image-final.jpg') center/contain no-repeat #111; 
+#final {
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  background: #000;
 }
+
+/* 🌫️ Imagen final suave */
+#final::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: url('Image-final.jpg') center/contain no-repeat;
+  opacity: 0;
+  transition: opacity 4s ease;
+  z-index: 0;
+}
+#final.show-bg::before {
+  opacity: 1;
+}
+
+/* Carta */
 #letter {
-  background: rgba(0,0,0,0.85); width: 85%; max-width: 550px; padding: 30px;
-  border: 2px solid #ffcb05; border-radius: 20px; white-space: pre-wrap;
-  box-shadow: 0 0 30px rgba(0,0,0,1); line-height: 1.6; font-size: 1.1rem;
-  animation: letterFade 1.5s ease;
-}
-@keyframes letterFade {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+  position: relative;
+  z-index: 2;
+  background: rgba(0,0,0,0.85);
+  padding: 30px;
+  border-radius: 20px;
+  border: 2px solid #ffcb05;
+  box-shadow: 0 0 25px #ffcb05;
 }
 
 /* TRAINER */
 #trainer { background: url('Trainer-card.png') center/contain no-repeat #000; }
 
 /* BOTONES */
-button { 
-    padding: 15px 35px; cursor: pointer; background: #ffcb05; color: #2a75bb; 
-    border: none; border-radius: 30px; font-weight: bold; letter-spacing: 1px;
-    box-shadow: 0 5px 0 #c7a008; transition: 0.1s; position: relative; overflow: hidden;
+button {
+  padding: 15px 35px;
+  background: #ffcb05;
+  color: #2a75bb;
+  border-radius: 30px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 0 10px #ffcb05;
+  transition: 0.2s;
 }
-button:active { transform: translateY(3px); box-shadow: none; }
+button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 20px #ffcb05;
+}
 
-button::after {
-  content: "";
+/* 🎉 Partículas */
+#particles {
   position: absolute;
-  width: 300%;
-  height: 300%;
-  top: -100%;
-  left: -100%;
-  background: radial-gradient(circle, rgba(255,255,255,0.4), transparent 60%);
-  opacity: 0;
-  transition: 0.4s;
-}
-button:hover::after {
-  opacity: 1;
-  top: -50%;
-  left: -50%;
-}
-
-/* CONFETTI */
-#confetti {
-  position: fixed;
-  top: 0;
-  left: 0;
+  inset: 0;
   pointer-events: none;
+  z-index: 1;
 }
 </style>
 </head>
@@ -142,243 +166,138 @@ button:hover::after {
 <audio id="music_battle" src="gone.mp3" loop></audio>
 <audio id="music_final" src="extra.mp3" loop></audio>
 
-<!-- SFX -->
-<audio id="sfx_click" src="click.mp3"></audio>
-<audio id="sfx_hover" src="hover.mp3"></audio>
-<audio id="sfx_success" src="success.mp3"></audio>
-<audio id="sfx_error" src="error.mp3"></audio>
+<audio id="click" src="click.mp3"></audio>
+<audio id="hover" src="hover.mp3"></audio>
+<audio id="success" src="success.mp3"></audio>
+<audio id="error" src="error.mp3"></audio>
 
-<div id="menu" class="screen" style="display: flex;">
-  <h1 style="font-size: 3.5rem; text-shadow: 4px 4px #2a75bb; -webkit-text-stroke: 2px white; text-align: center;">¡20 años de supervivencia!</h1>
-  <button onclick="showLevels()">INICIAR AVENTURA</button>
+<div id="menu" class="screen" style="display:flex;">
+<h1>¡20 años de supervivencia!</h1>
+<button onclick="showLevels()">INICIAR AVENTURA</button>
 </div>
 
 <div id="level-select" class="screen">
-  <h2 style="font-size: 2.5rem; color: #ffcb05; text-shadow: 2px 2px #000;">MAPA DE NIVELES</h2>
-  <div style="display: flex; flex-direction: column; gap: 10px;">
-    <button id="btn-lvl1" class="level-btn" onclick="startSpecificLevel(1)">
-      <img src="icono-nivel-1.gif"> NIVEL 1: Poké-Playlist
-    </button>
-    <button id="btn-lvl2" class="level-btn locked" onclick="startSpecificLevel(2)">
-      <img src="icono-nivel-2.gif"> NIVEL 2: Batalla
-    </button>
-    <button id="btn-lvl3" class="level-btn locked" onclick="startSpecificLevel(3)">
-      <img src="icono-nivel-3.gif"> NIVEL 3: El Mensaje
-    </button>
-    <button id="btn-lvl4" class="level-btn locked" onclick="startSpecificLevel(4)">
-      <img src="icono-nivel-4.gif"> NIVEL 4: Trainer Card
-    </button>
-  </div>
+<h2>MAPA DE NIVELES</h2>
+<button id="btn-lvl1" onclick="startSpecificLevel(1)">NIVEL 1</button>
+<button id="btn-lvl2" class="locked" onclick="startSpecificLevel(2)">NIVEL 2</button>
+<button id="btn-lvl3" class="locked" onclick="startSpecificLevel(3)">NIVEL 3</button>
+<button id="btn-lvl4" class="locked" onclick="startSpecificLevel(4)">NIVEL 4</button>
 </div>
 
 <div id="playlist-screen" class="screen">
-  <div class="playlist-container">
-    <h2 style="color: #ffcb05; margin-bottom: 20px;">🎵 REPRODUCTOR DE YON</h2>
-    <div class="song-item" onclick="playMusic('music_menu', this)">
-      <span>☁️ Cloud 9</span> <small>▶️</small>
-    </div>
-    <div class="song-item" onclick="playMusic('music_game', this)">
-      <span>✨ Just the Way</span> <small>▶️</small>
-    </div>
-    <div class="song-item" onclick="playMusic('music_battle', this)">
-      <span>🔥 Gone, Gone, Gone</span> <small>▶️</small>
-    </div>
-    <div class="song-item" onclick="playMusic('music_final', this)">
-      <span>🌸 Like You Do</span> <small>▶️</small>
-    </div>
-    <br>
-    <button onclick="completeCurrentLevel()" style="background: #4CAF50; color: white; box-shadow: 0 5px 0 #2e6631;">
-      LISTO PARA LA BATALLA ⚔️
-    </button>
-  </div>
+<button onclick="completeCurrentLevel()">LISTO</button>
 </div>
 
 <div id="level-transition" class="screen">
-  <div class="transition-box">
-    <h2 id="trans-title">¡NIVEL SUPERADO!</h2>
-    <img id="transition-icon-img" src="" style="width: 100px;">
-    <br>
-    <button onclick="goToNextLevel()">CONTINUAR AL NEXT LEVEL <span id="transition-next-num"></span></button>
-  </div>
+<button onclick="goToNextLevel()">CONTINUAR</button>
 </div>
 
 <div id="battle" class="screen">
-  <div style="background:rgba(0,0,0,0.85); padding:40px; border-radius:25px; border:3px solid #ffcb05; text-align: center;">
-    <h2 style="color:#ffcb05; margin-top:0; font-size: 2rem;">¡BATALLA EMO-CIONAL!</h2>
-    <p style="font-size: 1.2rem; margin-bottom: 30px;">¿Qué harás ahora?</p>
-    <button onclick="choice(999)">⚡ AMAR X100PRE</button><br><br>
-    <button onclick="choice(1)" style="background:#fff; color:#333;"> ¿¡DUDAR!?</button>
-  </div>
+<button onclick="choice(999)">AMAR</button>
+<button onclick="choice(1)">DUDAR</button>
 </div>
 
-<div id="final" class="screen"><div id="letter"></div></div>
+<div id="final" class="screen">
+<canvas id="particles"></canvas>
+<div id="letter"></div>
+</div>
 
 <div id="trainer" class="screen">
-    <button onclick="showLevels()" style="position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);">VOLVER AL MAPA</button>
+<button onclick="showLevels()">VOLVER</button>
 </div>
-
-<canvas id="confetti"></canvas>
 
 <script>
 let currentPlayingLevel = 1;
 let highestUnlockedLevel = 1;
 
 function hideAllScreens() {
-    document.querySelectorAll('.screen').forEach(el => el.style.display = "none");
+ document.querySelectorAll('.screen').forEach(el => el.style.display="none");
 }
 
 function showLevels() {
-    hideAllScreens();
-    document.getElementById("level-select").style.display = "flex";
-    for(let i=1; i<=4; i++) {
-        let btn = document.getElementById("btn-lvl"+i);
-        if(i <= highestUnlockedLevel) {
-            btn.classList.remove("locked");
-            btn.disabled = false;
-        }
-    }
+ hideAllScreens();
+ document.getElementById("level-select").style.display="flex";
 }
 
 function startSpecificLevel(level) {
-    hideAllScreens();
-    currentPlayingLevel = level;
-    
-    if(level === 1) {
-        document.getElementById("playlist-screen").style.display = "flex";
-    } else if(level === 2) {
-        document.getElementById("battle").style.display = "flex";
-        playMusic("music_battle");
-    } else if(level === 3) {
-        document.getElementById("final").style.display = "flex";
-        playMusic("music_final");
-        triggerFinalText();
-    } else if(level === 4) {
-        document.getElementById("trainer").style.display = "flex";
-    }
+ hideAllScreens();
+ currentPlayingLevel = level;
+
+ if(level===3){
+  const final = document.getElementById("final");
+  final.style.display="flex";
+  setTimeout(()=>final.classList.add("show-bg"),500);
+  triggerFinalText();
+  startParticles();
+ }
 }
 
-function completeCurrentLevel() {
-    if (currentPlayingLevel >= 4) {
-        showLevels();
-        return;
-    }
-    let next = currentPlayingLevel + 1;
-    highestUnlockedLevel = Math.max(highestUnlockedLevel, next);
-    
-    hideAllScreens();
-    document.getElementById("level-transition").style.display = "flex";
-    document.getElementById("transition-next-num").innerText = next;
-    document.getElementById("transition-icon-img").src = "icono-nivel-" + next + ".gif";
+function completeCurrentLevel(){
+ highestUnlockedLevel++;
 }
 
-function goToNextLevel() {
-    startSpecificLevel(currentPlayingLevel + 1);
+function goToNextLevel(){}
+
+function choice(v){
+ if(v===999){
+  play("success");
+  completeCurrentLevel();
+ } else {
+  play("error");
+ }
 }
 
-function choice(v) {
-    if (v === 999) {
-        completeCurrentLevel();
-    } else {
-        alert("¡Error! Esa opción no existe en este corazón. ❤️");
-    }
+/* CARTA */
+function triggerFinalText(){
+ const text=`Hola Yon... ♥
+
+Feliz cumpleaños...`;
+ let i=0;
+ const box=document.getElementById("letter");
+ const interval=setInterval(()=>{
+  box.textContent+=text[i];
+  i++;
+  if(i>=text.length) clearInterval(interval);
+ },40);
 }
 
-function triggerFinalText() {
-    const text = `Hola Yon... ♥\n\nFeliz cumpleaños.\n Pensaba escribirte algo súper profundo, pero ya sabes que no es lo mío, en fiin, Te amooo.\n Admiro mucho la persona increíble que eres.
-    
- Gracias por estar conmigo estos últimos años aunque a veces se complique todo, te seguiré escogiendo a tí una y mil veces<3
-    
- Felices 20 mi vidam. 🌸`;
-    
-    let i = 0;
-    const box = document.getElementById("letter");
-    box.textContent = "";
-    
-    const interval = setInterval(() => {
-        box.textContent += text[i];
-        i++;
-        if (i >= text.length) {
-            clearInterval(interval);
-            setTimeout(() => completeCurrentLevel(), 6000);
-        }
-    }, 50);
+/* SONIDOS */
+function play(id){
+ const a=document.getElementById(id);
+ if(a){ a.currentTime=0; a.play().catch(()=>{}); }
 }
 
-function playMusic(id, element) {
-    document.querySelectorAll('audio').forEach(a => { a.pause(); });
-    const track = document.getElementById(id);
-    if(track) {
-        track.currentTime = 0;
-        track.play().catch(()=>{});
-    }
-
-    if(element) {
-        document.querySelectorAll('.song-item').forEach(item => item.classList.remove('active'));
-        element.classList.add('active');
-    }
-}
-
-/* SFX */
-function playSFX(id) {
-    const sfx = document.getElementById(id);
-    if (sfx) {
-        sfx.currentTime = 0;
-        sfx.play().catch(()=>{});
-    }
-}
-
-document.querySelectorAll("button").forEach(btn => {
-    btn.addEventListener("mouseenter", () => playSFX("sfx_hover"));
-    btn.addEventListener("click", () => playSFX("sfx_click"));
+document.querySelectorAll("button").forEach(b=>{
+ b.addEventListener("mouseenter",()=>play("hover"));
+ b.addEventListener("click",()=>play("click"));
 });
 
-const originalChoice = choice;
-choice = function(v) {
-    if (v === 999) playSFX("sfx_success");
-    else playSFX("sfx_error");
-    originalChoice(v);
-};
+/* PARTÍCULAS SOLO FINAL */
+function startParticles(){
+ const canvas=document.getElementById("particles");
+ const ctx=canvas.getContext("2d");
+ canvas.width=window.innerWidth;
+ canvas.height=window.innerHeight;
 
-const originalComplete = completeCurrentLevel;
-completeCurrentLevel = function() {
-    playSFX("sfx_success");
-    originalComplete();
-};
+ let p=[];
+ for(let i=0;i<80;i++){
+  p.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,r:Math.random()*3+1});
+ }
 
-/* CONFETTI */
-const canvas = document.getElementById("confetti");
-const ctx = canvas.getContext("2d");
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
-
-let confetti = [];
-for (let i = 0; i < 100; i++) {
-    confetti.push({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        r: Math.random() * 6 + 2,
-        d: Math.random() * 100
-    });
+ function draw(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle="#ffcb05";
+  p.forEach(e=>{
+   ctx.beginPath();
+   ctx.arc(e.x,e.y,e.r,0,Math.PI*2);
+   ctx.fill();
+   e.y+=1;
+   if(e.y>canvas.height) e.y=0;
+  });
+ }
+ setInterval(draw,30);
 }
-
-function drawConfetti() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = "#ffcb05";
-    confetti.forEach(c => {
-        ctx.beginPath();
-        ctx.arc(c.x, c.y, c.r, 0, Math.PI * 2);
-        ctx.fill();
-    });
-    confetti.forEach(c => {
-        c.y += Math.cos(c.d) + 2;
-        if (c.y > canvas.height) {
-            c.y = 0;
-            c.x = Math.random() * canvas.width;
-        }
-    });
-}
-
-setInterval(drawConfetti, 30);
 </script>
+
 </body>
 </html>
