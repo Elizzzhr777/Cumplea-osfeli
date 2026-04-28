@@ -7,9 +7,9 @@
 <style>
 body { margin: 0; background: #000; color: #fff; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
 
-/* ✨ BORDES FOSFORESCENTES GLOBALES */
-* {
-  box-shadow: 0 0 5px rgba(255,203,5,0.2);
+/* ✨ BORDES GLOW */
+button, .level-btn, #letter, .playlist-container, .transition-box {
+  box-shadow: 0 0 10px rgba(255,203,5,0.4);
 }
 
 /* Pantallas */
@@ -21,72 +21,36 @@ body { margin: 0; background: #000; color: #fff; font-family: 'Segoe UI', sans-s
   inset: 0;
   animation: fadeIn 0.8s ease;
 }
-
 @keyframes fadeIn {
   from { opacity: 0; transform: scale(1.03); }
   to { opacity: 1; transform: scale(1); }
 }
 
-/* MENÚ */
+/* MENÚ Y MAPA */
 #menu, #level-select {
   flex-direction: column; justify-content: center; align-items: center;
   background: url('img-fondo1.gif') center/cover no-repeat;
 }
 
-h1 {
-  animation: glowText 2s infinite alternate;
-}
-
-@keyframes glowText {
-  from { text-shadow: 0 0 10px #fff; }
-  to { text-shadow: 0 0 25px #ffcb05, 0 0 40px #2a75bb; }
-}
-
-/* BOTONES */
-button { 
-    padding: 15px 35px; cursor: pointer; background: #ffcb05; color: #2a75bb; 
-    border: none; border-radius: 30px; font-weight: bold;
-    box-shadow: 0 0 10px #ffcb05, 0 5px 0 #c7a008;
-    transition: 0.15s;
-}
-button:hover {
-  transform: scale(1.05);
-  box-shadow: 0 0 20px #ffcb05;
-}
-button:active { transform: translateY(3px); }
-
-/* LEVEL BUTTON */
 .level-btn {
   width: 350px; display: flex; align-items: center; gap: 15px;
   margin-bottom: 15px; background: rgba(0,0,0,0.8); color: #ffcb05; 
   border: 2px solid #ffcb05; padding: 10px; border-radius: 15px;
+  transition: 0.3s;
 }
 .level-btn:hover { transform: scale(1.05); }
+.level-btn img { width: 40px; height: 40px; }
 
-/* PLAYLIST */
-#playlist-screen {
-  flex-direction: column; justify-content: center; align-items: center;
-  background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('img-fondo1.gif') center/cover no-repeat;
-}
-
-.song-item {
-  background: rgba(0,0,0,0.6); margin: 10px 0; padding: 15px;
-  border-radius: 15px; cursor: pointer;
-}
-.song-item:hover { transform: scale(1.05); }
+.locked { opacity: 0.5; filter: grayscale(100%); pointer-events: none; }
 
 /* FINAL */
 #final { 
   justify-content: center; align-items: center;
   background: url('Image-final.jpg') center/contain no-repeat #111;
-  background-size: contain;
   opacity: 0;
-  transition: opacity 3s ease;
+  transition: opacity 2s ease;
 }
-
-#final.show-bg {
-  opacity: 1;
-}
+#final.show-bg { opacity: 1; }
 
 #letter {
   background: rgba(0,0,0,0.85);
@@ -94,27 +58,28 @@ button:active { transform: translateY(3px); }
   border: 2px solid #ffcb05;
   border-radius: 20px;
   white-space: pre-wrap;
-  box-shadow: 0 0 20px #ffcb05;
-  animation: letterFade 2s ease;
 }
 
-@keyframes letterFade {
-  from { opacity: 0; transform: translateY(20px);}
-  to { opacity: 1; transform: translateY(0);}
+/* BOTONES */
+button {
+  padding: 15px 35px; cursor: pointer; background: #ffcb05; color: #2a75bb; 
+  border: none; border-radius: 30px;
 }
+button:hover { transform: scale(1.05); }
 
-/* PARTICULAS SOLO FINAL */
+/* PARTICULAS */
 #particles-final {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
+  position:absolute;
+  width:100%;
+  height:100%;
+  pointer-events:none;
 }
 </style>
 </head>
 
 <body>
 
+<!-- MUSICA ORIGINAL -->
 <audio id="music_menu" src="cloud9.mp3" loop></audio>
 <audio id="music_game" src="just_the_way.mp3" loop></audio>
 <audio id="music_battle" src="gone.mp3" loop></audio>
@@ -123,30 +88,30 @@ button:active { transform: translateY(3px); }
 <!-- SFX -->
 <audio id="sfx_click" src="click.mp3"></audio>
 <audio id="sfx_hover" src="hover.mp3"></audio>
-<audio id="sfx_success" src="success.mp3"></audio>
-<audio id="sfx_error" src="error.mp3"></audio>
 
-<div id="menu" class="screen" style="display: flex;">
+<div id="menu" class="screen" style="display:flex;">
   <h1>¡20 años de supervivencia!</h1>
   <button onclick="showLevels()">INICIAR AVENTURA</button>
 </div>
 
 <div id="level-select" class="screen">
-  <h2>MAPA DE NIVELES</h2>
-  <button id="btn-lvl1" onclick="startSpecificLevel(1)">NIVEL 1</button>
-  <button id="btn-lvl2" onclick="startSpecificLevel(2)">NIVEL 2</button>
-  <button id="btn-lvl3" onclick="startSpecificLevel(3)">NIVEL 3</button>
-  <button id="btn-lvl4" onclick="startSpecificLevel(4)">NIVEL 4</button>
+  <button id="btn-lvl1" class="level-btn" onclick="startSpecificLevel(1)">
+    <img src="icono-nivel-1.gif"> NIVEL 1
+  </button>
+  <button id="btn-lvl2" class="level-btn locked" onclick="startSpecificLevel(2)">
+    <img src="icono-nivel-2.gif"> NIVEL 2
+  </button>
+  <button id="btn-lvl3" class="level-btn locked" onclick="startSpecificLevel(3)">
+    <img src="icono-nivel-3.gif"> NIVEL 3
+  </button>
 </div>
 
 <div id="playlist-screen" class="screen">
-  <div class="song-item" onclick="playMusic('music_menu')">Cloud 9</div>
   <button onclick="completeCurrentLevel()">LISTO</button>
 </div>
 
 <div id="battle" class="screen">
   <button onclick="choice(999)">AMAR</button>
-  <button onclick="choice(1)">DUDAR</button>
 </div>
 
 <div id="final" class="screen">
@@ -156,55 +121,62 @@ button:active { transform: translateY(3px); }
 
 <script>
 let currentPlayingLevel = 1;
+let highestUnlockedLevel = 1;
 
-function hideAllScreens() {
-  document.querySelectorAll('.screen').forEach(el => el.style.display = "none");
+function hideAllScreens(){
+  document.querySelectorAll('.screen').forEach(el=>el.style.display="none");
 }
 
-function showLevels() {
+function showLevels(){
   hideAllScreens();
-  document.getElementById("level-select").style.display = "flex";
+  document.getElementById("level-select").style.display="flex";
 }
 
-function startSpecificLevel(level) {
+function startSpecificLevel(level){
   hideAllScreens();
-  currentPlayingLevel = level;
+  currentPlayingLevel=level;
 
-  if(level === 3) {
-    const final = document.getElementById("final");
-    final.style.display = "flex";
-
-    setTimeout(()=> final.classList.add("show-bg"), 500);
-
+  if(level===1){
+    document.getElementById("playlist-screen").style.display="flex";
+  }
+  if(level===2){
+    document.getElementById("battle").style.display="flex";
+  }
+  if(level===3){
+    const final=document.getElementById("final");
+    final.style.display="flex";
+    setTimeout(()=>final.classList.add("show-bg"),300);
     triggerFinalText();
     startParticles();
   }
 }
 
-function completeCurrentLevel(){}
-
-function choice(v){
-  if(v===999){ completeCurrentLevel(); }
+function completeCurrentLevel(){
+  highestUnlockedLevel++;
 }
 
-/* TEXTO */
-function triggerFinalText() {
-  const text = `Hola Yon... ♥\n\nFeliz cumpleaños...\nTe amo mucho.`;
+function choice(v){
+  if(v===999){ startSpecificLevel(3); }
+}
+
+/* TEXTO ORIGINAL */
+function triggerFinalText(){
+  const text=`Hola Yon... ♥\n\nFeliz cumpleaños.\n Te amo mucho.`;
   let i=0;
-  const box = document.getElementById("letter");
+  const box=document.getElementById("letter");
   box.textContent="";
 
-  const interval = setInterval(()=>{
+  const interval=setInterval(()=>{
     box.textContent+=text[i];
     i++;
-    if(i>=text.length){ clearInterval(interval); }
+    if(i>=text.length){ clearInterval(interval);}
   },50);
 }
 
-/* SFX */
+/* SONIDOS */
 function playSFX(id){
-  const sfx=document.getElementById(id);
-  if(sfx){ sfx.currentTime=0; sfx.play().catch(()=>{});}
+  const s=document.getElementById(id);
+  if(s){ s.currentTime=0; s.play().catch(()=>{});}
 }
 
 document.querySelectorAll("button").forEach(btn=>{
@@ -212,35 +184,29 @@ document.querySelectorAll("button").forEach(btn=>{
   btn.addEventListener("click",()=>playSFX("sfx_click"));
 });
 
-/* PARTICULAS FINAL */
+/* PARTICULAS */
 function startParticles(){
   const canvas=document.getElementById("particles-final");
   const ctx=canvas.getContext("2d");
   canvas.width=window.innerWidth;
   canvas.height=window.innerHeight;
 
-  let particles=[];
-  for(let i=0;i<80;i++){
-    particles.push({
-      x:Math.random()*canvas.width,
-      y:Math.random()*canvas.height,
-      r:Math.random()*3+1
-    });
+  let p=[];
+  for(let i=0;i<60;i++){
+    p.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height});
   }
 
-  function draw(){
+  setInterval(()=>{
     ctx.clearRect(0,0,canvas.width,canvas.height);
     ctx.fillStyle="#ffcb05";
-    particles.forEach(p=>{
+    p.forEach(e=>{
       ctx.beginPath();
-      ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.arc(e.x,e.y,2,0,Math.PI*2);
       ctx.fill();
-      p.y-=0.5;
-      if(p.y<0){ p.y=canvas.height; }
+      e.y-=0.5;
+      if(e.y<0)e.y=canvas.height;
     });
-  }
-
-  setInterval(draw,30);
+  },30);
 }
 </script>
 </body>
