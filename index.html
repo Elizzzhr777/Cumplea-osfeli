@@ -2,53 +2,67 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Pokémon Yon - Versión Final</title>
+<title>Pokémon Yon - 3D Cel Shaded Edition</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
 <style>
-/* ⚙️ SISTEMA BASE */
-body { margin: 0; background: #000; color: #fff; font-family: monospace; overflow: hidden; }
+body { margin: 0; background: #000; color: #fff; font-family: 'Segoe UI', Tahoma, sans-serif; overflow: hidden; }
 .screen { display: none; width: 100vw; height: 100vh; position: absolute; top: 0; left: 0; }
 
-/* 🎮 1. MENU (GIF FONDO 1) */
+/* 1. MENU - Estética Anime */
 #menu {
   flex-direction: column; justify-content: center; align-items: center;
   background: url('img-fondo1.gif') center/cover no-repeat;
 }
-#menu h1 { background: rgba(0,0,0,0.8); padding: 15px 30px; border-radius: 10px; border: 2px solid #fff; text-align: center; }
+#menu h1 { 
+    font-size: 3rem; text-shadow: 3px 3px 0px #000; 
+    -webkit-text-stroke: 1px white; color: #ffcb05;
+}
 
-/* 🗺️ 2. GAME MAP (JPG FONDO 1) */
-#game { background: url('img-fondo1.jpg') center/cover no-repeat; }
-.player { width: 48px; height: 48px; position: absolute; background-size: contain; background-repeat: no-repeat; z-index: 5;}
-#yon { background-image: url('Yon.png'); }
-#pika { background-image: url('pikachu.png'); }
-#hud { position: absolute; top: 15px; left: 15px; background: rgba(0,0,0,0.8); padding: 10px; border: 1px solid #fff; border-radius: 5px; z-index: 10; font-size: 16px; }
+/* 2. GAME (Contenedor para Three.js) */
+#game-container { width: 100%; height: 100%; position: absolute; }
+#hud { 
+    position: absolute; top: 20px; left: 20px; z-index: 100;
+    background: rgba(0,0,0,0.7); padding: 15px; border-radius: 50px;
+    border: 2px solid #fff; font-weight: bold;
+}
 
-/* ⚔️ 3. BATTLE (GIF PIKACHU) */
+/* 3. BATTLE - Cel Shaded GIF */
 #battle {
   flex-direction: column; justify-content: center; align-items: center;
   background: url('pikachu-pokemon.gif') center/cover no-repeat;
 }
-#battle h2 { background: rgba(0,0,0,0.8); padding: 15px; border-radius: 10px; border: 1px solid #fff; margin-bottom: 20px; text-align: center; }
-.btn-container { display: flex; flex-direction: column; gap: 10px; width: 80%; max-width: 300px; }
 
-/* 💌 4. FINAL SCENE (FOTO FINAL + CARTA OSCURA) */
+/* 4. FINAL - Collage Corregido */
 #final {
   justify-content: center; align-items: center;
-  background: url('Image-final.jpg') center/cover no-repeat;
+  background: url('Image-final.jpg') center/contain no-repeat #1a1a1a; /* 'contain' hace que se vea el collage completo */
 }
 #letter {
-  background: rgba(0,0,0,0.85); /* Fondo muy oscuro para que la letra resalte sí o sí */
-  width: 85%; max-width: 600px; min-height: 200px; padding: 30px;
-  border: 2px solid #fff; border-radius: 10px; font-size: 16px; line-height: 1.6;
-  white-space: pre-wrap; box-shadow: 0 0 30px rgba(0,0,0,0.9);
+  background: rgba(0,0,0,0.9);
+  width: 80%; max-width: 500px; padding: 25px;
+  border: 2px solid #ffcb05; border-radius: 15px;
+  color: #fff; line-height: 1.5; white-space: pre-wrap;
+  box-shadow: 0 0 20px rgba(255,203,5,0.5);
+  font-size: 1.1rem;
 }
 
-/* 🏆 5. TRAINER CARD (CIERRE) */
+/* 5. TRAINER CARD FINAL */
 #trainer { background: url('Trainer-card.png') center/contain no-repeat #000; }
 
-/* 🖲️ BOTONES GLOBALES */
-button { padding: 12px 24px; cursor: pointer; font-family: inherit; font-size: 16px; font-weight: bold; background: #000; color: #fff; border: 2px solid #fff; border-radius: 8px; transition: 0.2s; }
-button:hover { background: #fff; color: #000; transform: scale(1.05); }
+/* 🪄 Efecto Cel Shading en Personajes (Filtros de contorno) */
+.cel-character {
+    filter: drop-shadow(1px 1px 0 black) drop-shadow(-1px -1px 0 black);
+    image-rendering: pixelated; /* Mantiene el look nítido */
+}
+
+button { 
+    padding: 15px 30px; cursor: pointer; background: #ffcb05; color: #2a75bb; 
+    border: none; border-radius: 25px; font-size: 1.2rem; font-weight: bold;
+    box-shadow: 0 4px 0 #c7a008; transition: 0.1s;
+}
+button:active { transform: translateY(4px); box-shadow: none; }
 </style>
 </head>
 
@@ -60,22 +74,19 @@ button:hover { background: #fff; color: #000; transform: scale(1.05); }
 <audio id="music_final" src="extra.mp3" loop></audio>
 
 <div id="menu" class="screen" style="display: flex;">
-  <h1>POKÉMON YON</h1>
-  <button onclick="startGame()">Nueva Aventura</button>
+  <h1>POKÉMON YON 3D</h1>
+  <button onclick="startGame()">INICIAR AVENTURA</button>
 </div>
 
 <div id="game" class="screen">
-  <div id="hud">Amor: <span id="love">0</span></div>
-  <div id="yon" class="player"></div>
-  <div id="pika" class="player"></div>
-</div>
+  <div id="hud">💖 AMOR: <span id="love">0</span></div>
+  <div id="game-container"></div> </div>
 
 <div id="battle" class="screen">
-  <h2>¡Batalla emo-cional!</h2>
-  <div class="btn-container">
-    <button onclick="choice(999)">⚡ Amar x100pre</button>
-    <button onclick="choice(1)">💛 Confiar</button>
-    <button onclick="choice(-1)">💔 Dudar?</button>
+  <div style="background:rgba(0,0,0,0.8); padding:20px; border-radius:20px; text-align:center;">
+    <h2 style="color:#ffcb05">¡BATALLA EMOCIONAL!</h2>
+    <button onclick="choice(999)">⚡ AMAR POR SIEMPRE</button><br><br>
+    <button onclick="choice(1)" style="background:#fff">💛 CONFIAR</button>
   </div>
 </div>
 
@@ -86,169 +97,146 @@ button:hover { background: #fff; color: #000; transform: scale(1.05); }
 <div id="trainer" class="screen"></div>
 
 <script>
-/* =========================================
-   ⚙️ MOTOR PRINCIPAL DEL JUEGO
-   ========================================= */
-const TILE = 48;
-let mode = "menu", love = 0, moving = false;
-let grid = { x: 4, y: 2 };
-let trail = [];
+/* ==========================================================
+   🎮 ENGINE 3D - INGENIERÍA DE VIDEOJUEGOS
+   ========================================================== */
+let scene, camera, renderer, yonSprite, pikaSprite;
+let mode = "menu", love = 0;
+let moveForward = false, moveBackward = false;
 
-const yon = document.getElementById("yon");
-const pika = document.getElementById("pika");
+function init3D() {
+    scene = new THREE.Scene();
+    // Cámara Dinámica
+    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.getElementById('game-container').appendChild(renderer.domElement);
 
-/* --- 🔄 SISTEMA DE PANTALLAS A PRUEBA DE FALLOS --- */
-function switchScreen(screenId) {
-  // 1. Apagamos todas las pantallas de forma estricta
-  document.getElementById("menu").style.display = "none";
-  document.getElementById("game").style.display = "none";
-  document.getElementById("battle").style.display = "none";
-  document.getElementById("final").style.display = "none";
-  document.getElementById("trainer").style.display = "none";
+    // Luz para simular Cel Shading
+    const light = new THREE.DirectionalLight(0xffffff, 1);
+    light.position.set(0, 10, 10);
+    scene.add(light);
 
-  // 2. Encendemos solo la que necesitamos con el Display correcto
-  if (screenId === "game" || screenId === "trainer") {
-    document.getElementById(screenId).style.display = "block";
-  } else {
-    document.getElementById(screenId).style.display = "flex";
-  }
-  mode = screenId;
+    // Suelo 3D con textura
+    const loader = new THREE.TextureLoader();
+    const groundTexture = loader.load('img-fondo1.jpg');
+    groundTexture.wrapS = groundTexture.wrapT = THREE.RepeatWrapping;
+    groundTexture.repeat.set(10, 10);
+    const ground = new THREE.Mesh(
+        new THREE.PlaneGeometry(100, 100),
+        new THREE.MeshToonMaterial({ map: groundTexture }) // Material Toon/Cel Shaded
+    );
+    ground.rotation.x = -Math.PI / 2;
+    scene.add(ground);
+
+    // Personajes (Usamos Sprites 3D con eliminación de fondo mediante AlphaTest)
+    const yonTex = loader.load('Yon.png');
+    const pikaTex = loader.load('pikachu.png');
+
+    const materialYon = new THREE.SpriteMaterial({ map: yonTex, alphaTest: 0.5 });
+    yonSprite = new THREE.Sprite(materialYon);
+    yonSprite.scale.set(2, 2, 1);
+    yonSprite.position.y = 1;
+    scene.add(yonSprite);
+
+    const materialPika = new THREE.SpriteMaterial({ map: pikaTex, alphaTest: 0.5 });
+    pikaSprite = new THREE.Sprite(materialPika);
+    pikaSprite.scale.set(1.2, 1.2, 1);
+    pikaSprite.position.set(1.5, 0.6, -0.5);
+    scene.add(pikaSprite);
+
+    camera.position.set(0, 3, 6);
+    camera.lookAt(yonSprite.position);
+
+    animate3D();
 }
 
-/* --- 🎵 GESTOR DE AUDIO --- */
-function playMusic(id) {
-  document.querySelectorAll('audio').forEach(a => { a.pause(); a.currentTime = 0; });
-  const audio = document.getElementById(id);
-  if(audio) audio.play().catch(e => console.log("Esperando interacción del usuario"));
+/* --- 🧊 ANIMACIÓN DE LOCOMOCIÓN Y IDLE --- */
+function animate3D() {
+    if (mode !== "game") return;
+    requestAnimationFrame(animate3D);
+
+    const time = Date.now() * 0.005;
+
+    // 1. Efecto de Respiración (Idle procedimental)
+    yonSprite.scale.y = 2 + Math.sin(time) * 0.05;
+    pikaSprite.scale.y = 1.2 + Math.cos(time) * 0.03;
+
+    // 2. Movimiento Dinámico
+    if (moveForward) {
+        yonSprite.position.z -= 0.1;
+        // Efecto balanceo al caminar
+        yonSprite.rotation.z = Math.sin(time * 2) * 0.1;
+        // Cámara Dinámica que sigue al jugador
+        camera.position.z -= 0.1;
+        
+        // Probabilidad de encuentro
+        if (Math.random() < 0.01) startBattle();
+    }
+
+    // Seguidor (Pikachu sigue a Yon con suavidad)
+    pikaSprite.position.lerp(new THREE.Vector3(yonSprite.position.x + 1.2, 0.6, yonSprite.position.z + 0.8), 0.1);
+
+    renderer.render(scene, camera);
 }
 
-/* --- 🚀 INICIO DEL JUEGO --- */
+/* --- ⚙️ LÓGICA DE CONTROL --- */
 function startGame() {
-  switchScreen("game");
-  playMusic("music_game");
-  updatePositions();
-}
-
-/* --- 🕹️ CONTROLES Y MOVIMIENTO --- */
-document.addEventListener("keydown", e => {
-  if (mode !== "game" || moving) return;
-  let dx = 0, dy = 0;
-  
-  if (e.key === "ArrowUp") dy = -1;
-  if (e.key === "ArrowDown") dy = 1;
-  if (e.key === "ArrowLeft") dx = -1;
-  if (e.key === "ArrowRight") dx = 1;
-
-  if (dx !== 0 || dy !== 0) movePlayer(dx, dy);
-});
-
-function movePlayer(dx, dy) {
-  moving = true;
-  grid.x += dx;
-  grid.y += dy;
-
-  animateMovement(() => {
-    // Entrar en batalla al pisar hierba (Y mayor a 6)
-    if (grid.y > 6 && Math.random() < 0.3) {
-      startBattle();
-    }
-    moving = false;
-  });
-}
-
-function animateMovement(callback) {
-  let startX = yon.offsetLeft, startY = yon.offsetTop;
-  let endX = grid.x * TILE, endY = grid.y * TILE;
-  let t = 0;
-
-  function step() {
-    t += 0.15; // Velocidad de caminata
-    if (t > 1) t = 1;
-
-    yon.style.left = (startX + (endX - startX) * t) + "px";
-    yon.style.top = (startY + (endY - startY) * t) + "px";
-
-    let target = trail[trail.length - 1] || { x: startX, y: startY };
-    let pX = parseFloat(pika.style.left || startX);
-    let pY = parseFloat(pika.style.top || startY);
-
-    pika.style.left = (pX + (target.x - pX) * 0.2) + "px";
-    pika.style.top = (pY + (target.y - pY) * 0.2) + "px";
-
-    if (t < 1) {
-      requestAnimationFrame(step);
-    } else {
-      trail.push({ x: endX, y: endY });
-      if (trail.length > 5) trail.shift();
-      if (callback) callback();
-    }
-  }
-  step();
-}
-
-function updatePositions() {
-  yon.style.left = grid.x * TILE + "px";
-  yon.style.top = grid.y * TILE + "px";
-  pika.style.left = (grid.x * TILE - 48) + "px";
-  pika.style.top = (grid.y * TILE) + "px";
-}
-
-/* --- ⚔️ SISTEMA DE BATALLA --- */
-function startBattle() {
-  switchScreen("battle");
-  playMusic("music_battle");
-}
-
-function choice(value) {
-  if (value === 999) {
-    // Va directo al final si elige "Amar x100pre"
-    triggerFinalSequence();
-  } else {
-    // Vuelve al mapa si elige otra cosa
-    love += value;
-    document.getElementById("love").textContent = love;
-    switchScreen("game");
+    document.getElementById("menu").style.display = "none";
+    document.getElementById("game").style.display = "block";
+    mode = "game";
     playMusic("music_game");
-  }
+    if (!scene) init3D();
 }
 
-/* --- 💌 SECUENCIA FINAL Y MÁQUINA DE ESCRIBIR --- */
-function triggerFinalSequence() {
-  switchScreen("final");
-  playMusic("music_final");
-  
-  const text = `Hola Yon... ♥\n\nFeliz cumpleaños.\n\nPensé en escribirte algo súper profundo...\npero ya sabes que lo mío no es ser cursi.\n\nAsí que bueno, lo intentaré jiji\n\nTe amooo.\n\nPero, sobre todo...\nte respeto.\ny te admiro muchísimo.\n\nAdmiro tu capacidad para soportarme kjjsj...\ny la persona increíble que eres.\n\nAún cuando todo se pone difícil...\nyo sigo eligiéndote.\n\nDai. 🌸`;
-  
-  const letterBox = document.getElementById("letter");
-  letterBox.textContent = ""; // Limpiamos la caja
-  let i = 0;
-  
-  // Borramos cualquier intervalo previo por seguridad
-  if(window.typeWriter) clearInterval(window.typeWriter);
-  
-  window.typeWriter = setInterval(() => {
-    letterBox.textContent += text.charAt(i);
-    i++;
-    
-    // Cuando termina de escribir toda la carta
-    if (i >= text.length) {
-      clearInterval(window.typeWriter);
-      
-      // Espera 6 segundos exactos para que lea, y pasa a la Trainer Card
-      setTimeout(() => {
-        switchScreen("trainer");
-      }, 6000);
+function startBattle() {
+    mode = "battle";
+    document.getElementById("battle").style.display = "flex";
+    playMusic("music_battle");
+}
+
+function choice(v) {
+    if (v === 999) triggerFinal();
+    else {
+        love += v;
+        document.getElementById("love").innerText = love;
+        document.getElementById("battle").style.display = "none";
+        mode = "game";
+        playMusic("music_game");
+        animate3D();
     }
-  }, 45); // Velocidad de la letra (45ms)
 }
 
-/* Asegurar que la primera vez que hace clic en la web inicie la música del menú */
-window.addEventListener('click', () => { 
-  if (mode === "menu" && document.getElementById("music_menu").paused) {
-    playMusic("music_menu"); 
-  }
-}, { once: true });
+function triggerFinal() {
+    mode = "final";
+    document.getElementById("battle").style.display = "none";
+    document.getElementById("final").style.display = "flex";
+    playMusic("music_final");
 
+    const text = `Hola Yon... ♥\n\nFeliz cumpleaños.\n\nTe amooo.\nAdmiro la persona increíble que eres.\nAún cuando todo se pone difícil...\nyo sigo eligiéndote.\n\nDai. 🌸`;
+    let i = 0;
+    const box = document.getElementById("letter");
+    const interval = setInterval(() => {
+        box.textContent += text[i];
+        i++;
+        if (i >= text.length) {
+            clearInterval(interval);
+            setTimeout(() => {
+                document.getElementById("final").style.display = "none";
+                document.getElementById("trainer").style.display = "flex";
+            }, 5000);
+        }
+    }, 50);
+}
+
+function playMusic(id) {
+    document.querySelectorAll('audio').forEach(a => { a.pause(); a.currentTime = 0; });
+    document.getElementById(id).play().catch(() => {});
+}
+
+window.addEventListener('keydown', e => { if (e.key === "ArrowUp") moveForward = true; });
+window.addEventListener('keyup', e => { if (e.key === "ArrowUp") moveForward = false; });
+window.addEventListener('click', () => { if(mode==="menu") playMusic("music_menu") }, {once:true});
 </script>
 </body>
 </html>
