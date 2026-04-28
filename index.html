@@ -95,7 +95,7 @@ button:active { transform: translateY(3px); box-shadow: none; }
   <h2 style="font-size: 2.5rem; color: #ffcb05;">MAPA DE NIVELES</h2>
   <div style="display: flex; flex-direction: column; gap: 10px;">
     <button id="btn-lvl1" class="level-btn" onclick="startSpecificLevel(1)">
-      <img src="icono-nivel-1.png"> NIVEL 1: Exploración 3D
+      <img src="icono-nivel-1.png"> NIVEL 1: Exploración
     </button>
     <button id="btn-lvl2" class="level-btn locked" onclick="startSpecificLevel(2)">
       <img src="icono-nivel-2.png"> NIVEL 2: Batalla
@@ -193,7 +193,7 @@ function initEngine() {
     const loader = new THREE.GLTFLoader();
 
     // Línea 174: Cargar a YON (Protagonista)
-    loader.load('Hitem3d-1777391060652.glb', (gltf) => {
+    loader.load('Hitem3d-1777390520423.glb', (gltf) => {
         yon3D = gltf.scene;
         yon3D.scale.set(1.5, 1.5, 1.5);
         yon3D.position.y = 0;
@@ -201,7 +201,7 @@ function initEngine() {
     });
 
     // Línea 184: Cargar a PIKACHU (Acompañante)
-    loader.load('Hitem3d-1777390520423.glb', (gltf) => {
+    loader.load('Hitem3d-1777391060652.glb', (gltf) => {
         pika3D = gltf.scene;
         pika3D.scale.set(0.8, 0.8, 0.8);
         pika3D.position.set(1.5, 0, 1);
