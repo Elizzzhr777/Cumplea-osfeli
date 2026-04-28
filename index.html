@@ -15,6 +15,32 @@ body { margin: 0; background: #000; color: #fff; font-family: 'Segoe UI', sans-s
   background: url('img-fondo1.gif') center/cover no-repeat;
 }
 
+/* 🗺️ NUEVO: SELECCIÓN DE NIVELES */
+#level-select {
+  flex-direction: column; justify-content: center; align-items: center;
+  background: url('img-fondo1.gif') center/cover no-repeat;
+}
+.level-btn {
+  width: 350px; display: flex; align-items: center; justify-content: flex-start; gap: 15px;
+  margin-bottom: 15px; background: rgba(0,0,0,0.8); color: #ffcb05; 
+  border: 2px solid #ffcb05;
+}
+.level-btn img { width: 40px; height: 40px; object-fit: contain; }
+.locked { opacity: 0.5; filter: grayscale(100%); cursor: not-allowed; pointer-events: none; }
+
+/* 🚀 NUEVO: TRANSICIÓN DE NIVEL */
+#level-transition {
+  flex-direction: column; justify-content: center; align-items: center;
+  background: rgba(0,0,0,0.9); z-index: 200;
+}
+.transition-box {
+  background: #111; padding: 40px; border-radius: 20px; border: 3px solid #4CAF50;
+  text-align: center; box-shadow: 0 0 20px #4CAF50;
+}
+.transition-icon {
+  width: 120px; height: 120px; margin: 20px 0; border: 2px dashed #ffcb05; border-radius: 10px; object-fit: contain;
+}
+
 /* GAME UI */
 #game-container { width: 100%; height: 100%; cursor: none; }
 #hud { 
@@ -29,7 +55,7 @@ body { margin: 0; background: #000; color: #fff; font-family: 'Segoe UI', sans-s
   background: url('pikachu-pokemon.gif') center/cover no-repeat;
 }
 
-/* FINAL SCENE - Collage Ajustado */
+/* FINAL SCENE */
 #final {
   justify-content: center; align-items: center;
   background: url('Image-final.jpg') center/contain no-repeat #111;
@@ -61,7 +87,36 @@ button:active { transform: translateY(3px); box-shadow: none; }
 
 <div id="menu" class="screen" style="display: flex;">
   <h1 style="font-size: 3.5rem; text-shadow: 4px 4px #2a75bb; -webkit-text-stroke: 2px white;">POKÉMON YON</h1>
-  <button onclick="startGame()">NUEVA AVENTURA</button>
+  <button onclick="showLevels()">INICIAR SISTEMA</button>
+</div>
+
+<div id="level-select" class="screen">
+  <h2 style="font-size: 2.5rem; color: #ffcb05; -webkit-text-stroke: 1px #000;">SELECCIÓN DE NIVEL</h2>
+  <div style="display: flex; flex-direction: column; gap: 10px;">
+    <button id="btn-lvl1" class="level-btn" onclick="startSpecificLevel(1)">
+      <img src="icono-nivel-1.png" alt="1"> NIVEL 1: Exploración
+    </button>
+    <button id="btn-lvl2" class="level-btn locked" onclick="startSpecificLevel(2)">
+      <img src="icono-nivel-2.png" alt="2"> NIVEL 2: Batalla
+    </button>
+    <button id="btn-lvl3" class="level-btn locked" onclick="startSpecificLevel(3)">
+      <img src="icono-nivel-3.png" alt="3"> NIVEL 3: La Carta
+    </button>
+    <button id="btn-lvl4" class="level-btn locked" onclick="startSpecificLevel(4)">
+      <img src="icono-nivel-4.png" alt="4"> NIVEL 4: Trainer Card
+    </button>
+  </div>
+</div>
+
+<div id="level-transition" class="screen">
+  <div class="transition-box">
+    <h2 style="color:#4CAF50; margin-top:0;">¡NIVEL SUPERADO!</h2>
+    <p style="color:#ffcb05; font-weight:bold;">Siguiente fase desbloqueada</p>
+    
+    <img id="transition-icon-img" class="transition-icon" src="icono-nivel-2.png" alt="Icono Siguiente">
+    <br><br>
+    <button onclick="goToNextLevel()">CONTINUAR AL NIVEL <span id="transition-next-num">2</span></button>
+  </div>
 </div>
 
 <div id="game" class="screen">
@@ -84,61 +139,125 @@ button:active { transform: translateY(3px); box-shadow: none; }
 let scene, camera, renderer, yonSprite, pikaSprite;
 let mode = "menu", love = 0, moveForward = false;
 
+/* 🎮 SISTEMA DE PROGRESIÓN (STATE MANAGER) */
+let highestUnlockedLevel = 1;
+let currentPlayingLevel = 1;
+
+function showLevels() {
+    hideAllScreens();
+    document.getElementById("level-select").style.display = "flex";
+    mode = "menu";
+    playMusic("music_menu");
+    
+    // Actualizar bloqueos visuales
+    for(let i = 1; i <= 4; i++) {
+        let btn = document.getElementById("btn-lvl" + i);
+        if (i <= highestUnlockedLevel) {
+            btn.classList.remove("locked");
+            btn.disabled = false;
+        } else {
+            btn.classList.add("locked");
+            btn.disabled = true;
+        }
+    }
+}
+
+function startSpecificLevel(levelNum) {
+    hideAllScreens();
+    currentPlayingLevel = levelNum;
+    mode = "game";
+
+    if (levelNum === 1) {
+        document.getElementById("game").style.display = "block";
+        playMusic("music_game");
+        if (!scene) initEngine();
+    } else if (levelNum === 2) {
+        document.getElementById("battle").style.display = "flex";
+        playMusic("music_battle");
+    } else if (levelNum === 3) {
+        document.getElementById("final").style.display = "flex";
+        playMusic("music_final");
+        triggerFinalText(); // Dispara la animación de texto
+    } else if (levelNum === 4) {
+        document.getElementById("trainer").style.display = "flex";
+        playMusic("music_menu"); // Opcional, música para pantalla final
+    }
+}
+
+function completeCurrentLevel() {
+    // Si completamos el nivel 4, no hay más a donde ir, volvemos al menú
+    if (currentPlayingLevel >= 4) {
+        showLevels();
+        return;
+    }
+
+    let nextLevel = currentPlayingLevel + 1;
+    if (nextLevel > highestUnlockedLevel) {
+        highestUnlockedLevel = nextLevel; // Desbloqueamos en el sistema
+    }
+
+    hideAllScreens();
+    document.getElementById("level-transition").style.display = "flex";
+    document.getElementById("transition-next-num").innerText = nextLevel;
+    
+    // INGENIERÍA: Aquí el motor buscará automáticamente el PNG del siguiente nivel.
+    // Asegúrate de tener guardados: icono-nivel-2.png, icono-nivel-3.png, etc.
+    document.getElementById("transition-icon-img").src = "icono-nivel-" + nextLevel + ".png";
+    mode = "transition";
+}
+
+function goToNextLevel() {
+    startSpecificLevel(currentPlayingLevel + 1);
+}
+
+function hideAllScreens() {
+    document.querySelectorAll('.screen').forEach(el => el.style.display = "none");
+}
+
 /* 🛠️ INGENIERÍA DE TEXTURAS: Generador de Suelo Toon */
 function createToonGrassTexture() {
     const canvas = document.createElement('canvas');
     canvas.width = 512; canvas.height = 512;
     const ctx = canvas.getContext('2d');
-
-    // Base Verde Pokémon (Flat)
     ctx.fillStyle = '#4CAF50';
     ctx.fillRect(0, 0, 512, 512);
-
-    // Añadir briznas de hierba estilizadas
     ctx.fillStyle = '#388E3C';
     for(let i=0; i<150; i++) {
-        let x = Math.random() * 512;
-        let y = Math.random() * 512;
-        ctx.fillRect(x, y, 10, 4); // Pequeños rectángulos para el Toon look
+        let x = Math.random() * 512, y = Math.random() * 512;
+        ctx.fillRect(x, y, 10, 4); 
     }
-
-    // Añadir flores amarillas minimalistas
     ctx.fillStyle = '#FFEB3B';
     for(let i=0; i<40; i++) {
         ctx.beginPath();
         ctx.arc(Math.random()*512, Math.random()*512, 3, 0, Math.PI*2);
         ctx.fill();
     }
-
     const texture = new THREE.CanvasTexture(canvas);
     texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-    texture.repeat.set(20, 20); // Repetir para que parezca un mundo infinito
+    texture.repeat.set(20, 20); 
     return texture;
 }
 
 function initEngine() {
     scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x87CEEB); // Cielo Azul Celeste
+    scene.background = new THREE.Color(0x87CEEB); 
 
     camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 1000);
     renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.getElementById('game-container').appendChild(renderer.domElement);
 
-    // Suelo Procedural
     const groundGeo = new THREE.PlaneGeometry(200, 200);
     const groundMat = new THREE.MeshToonMaterial({ map: createToonGrassTexture() });
     const ground = new THREE.Mesh(groundGeo, groundMat);
     ground.rotation.x = -Math.PI / 2;
     scene.add(ground);
 
-    // Iluminación Toon
     const sun = new THREE.DirectionalLight(0xffffff, 1.2);
     sun.position.set(5, 10, 7);
     scene.add(sun);
     scene.add(new THREE.AmbientLight(0xffffff, 0.4));
 
-    // Carga de Personajes con Cel-Shaded Outline simulado
     const loader = new THREE.TextureLoader();
     const materialYon = new THREE.SpriteMaterial({ map: loader.load('Yon.png'), alphaTest: 0.5 });
     yonSprite = new THREE.Sprite(materialYon);
@@ -159,70 +278,55 @@ function initEngine() {
 }
 
 function animate() {
-    if (mode !== "game") return;
+    if (mode !== "game" || currentPlayingLevel !== 1) return;
     requestAnimationFrame(animate);
     const time = Date.now() * 0.005;
 
-    // Animación Idle (Respiración/Balanceo)
     yonSprite.scale.y = 2 + Math.sin(time * 0.8) * 0.05;
     pikaSprite.position.y = 0.6 + Math.cos(time * 1.2) * 0.05;
 
     if (moveForward) {
         yonSprite.position.z -= 0.12;
-        yonSprite.rotation.z = Math.sin(time * 3) * 0.1; // Ciclo de caminata
+        yonSprite.rotation.z = Math.sin(time * 3) * 0.1; 
         camera.position.z -= 0.12;
-        if(Math.random() < 0.008) startBattle();
+        
+        // MODIFICADO: En lugar de ir directo a batalla, completa el Nivel 1
+        if(Math.random() < 0.008) {
+            moveForward = false; // Detener personaje
+            completeCurrentLevel(); 
+        }
     }
 
-    // Suavizado de seguimiento de Pikachu
     pikaSprite.position.lerp(new THREE.Vector3(yonSprite.position.x + 1.3, pikaSprite.position.y, yonSprite.position.z + 0.9), 0.15);
-
     renderer.render(scene, camera);
 }
 
-function startGame() {
-    document.getElementById("menu").style.display = "none";
-    document.getElementById("game").style.display = "block";
-    mode = "game";
-    playMusic("music_game");
-    if (!scene) initEngine();
-}
-
-function startBattle() {
-    mode = "battle";
-    document.getElementById("battle").style.display = "flex";
-    playMusic("music_battle");
-}
-
 function choice(v) {
-    if (v === 999) triggerFinal();
-    else {
+    if (v === 999) {
+        // MODIFICADO: Completar Nivel 2 en lugar de ir directo a carta final
+        completeCurrentLevel();
+    } else {
         love += v;
         document.getElementById("love").innerText = love;
-        document.getElementById("battle").style.display = "none";
-        mode = "game";
-        playMusic("music_game");
-        animate();
     }
 }
 
-function triggerFinal() {
-    mode = "final";
-    document.getElementById("battle").style.display = "none";
-    document.getElementById("final").style.display = "flex";
-    playMusic("music_final");
-    
+let letterInterval;
+function triggerFinalText() {
     const text = `Hola Yon... ♥\n\nFeliz cumpleaños.\n\nTe amooo.\nAdmiro la persona increíble que eres.\nAún cuando todo se pone difícil...\nyo sigo eligiéndote.\n\nFelicidades, mi Yon. 🌸`;
     let i = 0;
     const box = document.getElementById("letter");
-    const interval = setInterval(() => {
+    box.textContent = ""; // Limpiar por si se repite el nivel
+    
+    clearInterval(letterInterval);
+    letterInterval = setInterval(() => {
         box.textContent += text[i]; i++;
         if (i >= text.length) {
-            clearInterval(interval);
+            clearInterval(letterInterval);
             setTimeout(() => {
-                document.getElementById("final").style.display = "none";
-                document.getElementById("trainer").style.display = "flex";
-            }, 6000);
+                // MODIFICADO: Completar Nivel 3
+                completeCurrentLevel();
+            }, 5000);
         }
     }, 50);
 }
@@ -234,7 +338,7 @@ function playMusic(id) {
 
 window.addEventListener('keydown', e => { if (e.key === "ArrowUp") moveForward = true; });
 window.addEventListener('keyup', e => { if (e.key === "ArrowUp") moveForward = false; });
-window.addEventListener('click', () => { if(mode==="menu") playMusic("music_menu") }, {once:true});
+window.addEventListener('click', () => { if(mode==="menu" && document.getElementById("level-select").style.display === "none") playMusic("music_menu") }, {once:true});
 </script>
 </body>
 </html>
