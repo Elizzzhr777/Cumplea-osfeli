@@ -86,16 +86,16 @@ button:active { transform: translateY(3px); box-shadow: none; }
   <h2 style="font-size: 2.5rem; color: #ffcb05;">MAPA DE NIVELES</h2>
   <div style="display: flex; flex-direction: column; gap: 10px;">
     <button id="btn-lvl1" class="level-btn" onclick="startSpecificLevel(1)">
-      <img src="icono-nivel-1.png"> NIVEL 1: Poké-Playlist
+      <img src="icono-nivel-1.gif"> NIVEL 1: Poké-Playlist
     </button>
     <button id="btn-lvl2" class="level-btn locked" onclick="startSpecificLevel(2)">
-      <img src="icono-nivel-2.png"> NIVEL 2: Batalla
+      <img src="icono-nivel-2.gif"> NIVEL 2: Batalla
     </button>
     <button id="btn-lvl3" class="level-btn locked" onclick="startSpecificLevel(3)">
-      <img src="icono-nivel-3.png"> NIVEL 3: El Mensaje
+      <img src="icono-nivel-3.gif"> NIVEL 3: El Mensaje
     </button>
     <button id="btn-lvl4" class="level-btn locked" onclick="startSpecificLevel(4)">
-      <img src="icono-nivel-4.png"> NIVEL 4: Trainer Card
+      <img src="icono-nivel-4.gif"> NIVEL 4: Trainer Card
     </button>
   </div>
 </div>
@@ -113,11 +113,11 @@ button:active { transform: translateY(3px); box-shadow: none; }
       <small>▶️</small>
     </div>
     <div class="song-item" onclick="playMusic('music_battle', this)">
-      <span>🔥 Gone</span>
+      <span>🔥 Gone, Gone, Gone</span>
       <small>▶️</small>
     </div>
     <div class="song-item" onclick="playMusic('music_final', this)">
-      <span>🌸 Extra Theme</span>
+      <span>🌸 Like You Do</span>
       <small>▶️</small>
     </div>
 
@@ -133,7 +133,7 @@ button:active { transform: translateY(3px); box-shadow: none; }
     <h2 id="trans-title">¡NIVEL SUPERADO!</h2>
     <img id="transition-icon-img" class="transition-icon" src="" style="width: 100px;">
     <br>
-    <button onclick="goToNextLevel()">CONTINUAR AL NIVEL <span id="transition-next-num"></span></button>
+    <button onclick="goToNextLevel()">CONTINUAR AL NEXT LEVEL <span id="transition-next-num"></span></button>
   </div>
 </div>
 
@@ -141,7 +141,7 @@ button:active { transform: translateY(3px); box-shadow: none; }
   <div style="background:rgba(0,0,0,0.85); padding:30px; border-radius:25px; border:3px solid #ffcb05;">
     <h2 style="color:#ffcb05; margin-top:0;">¡BATALLA EMO-CIONAL!</h2>
     <button onclick="choice(999)">⚡ AMAR X100PRE</button><br><br>
-    <button onclick="choice(1)" style="background:#fff; color:#333;"> ¿DUDAR?</button>
+    <button onclick="choice(1)" style="background:#fff; color:#333;"> ¿¡DUDAR!?</button>
   </div>
 </div>
 
