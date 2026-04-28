@@ -6,22 +6,39 @@
 
 <style>
 body { margin: 0; background: #000; color: #fff; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
-.screen { display: none; width: 100vw; height: 100vh; position: absolute; inset: 0; }
+.screen { display: none; width: 100vw; height: 100vh; position: absolute; inset: 0; animation: fadeIn 0.8s ease; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(1.05); }
+  to { opacity: 1; transform: scale(1); }
+}
 
 /* MENÚ Y MAPA */
 #menu, #level-select {
   flex-direction: column; justify-content: center; align-items: center;
   background: url('img-fondo1.gif') center/cover no-repeat;
 }
+
+h1 {
+  animation: glowText 2s infinite alternate;
+}
+
+@keyframes glowText {
+  from { text-shadow: 0 0 10px #fff; }
+  to { text-shadow: 0 0 25px #ffcb05, 0 0 35px #2a75bb; }
+}
+
 .level-btn {
   width: 350px; display: flex; align-items: center; justify-content: flex-start; gap: 15px;
   margin-bottom: 15px; background: rgba(0,0,0,0.8); color: #ffcb05; 
   border: 2px solid #ffcb05; padding: 10px; border-radius: 15px; transition: 0.3s;
 }
+.level-btn:hover { transform: scale(1.05); box-shadow: 0 0 15px #ffcb05; }
+
 .level-btn img { width: 40px; height: 40px; object-fit: contain; }
 .locked { opacity: 0.5; filter: grayscale(100%); cursor: not-allowed; pointer-events: none; }
 
-/* 🎵 PLAYLIST (NIVEL 1) */
+/* PLAYLIST */
 #playlist-screen {
   flex-direction: column; justify-content: center; align-items: center;
   background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('img-fondo1.gif') center/cover no-repeat;
@@ -36,7 +53,7 @@ body { margin: 0; background: #000; color: #fff; font-family: 'Segoe UI', sans-s
   border-radius: 15px; cursor: pointer; border: 1px solid transparent;
   transition: 0.2s; display: flex; align-items: center; justify-content: space-between;
 }
-.song-item:hover { border-color: #ffcb05; background: rgba(42, 117, 187, 0.4); }
+.song-item:hover { transform: translateX(5px) scale(1.03); border-color: #ffcb05; background: rgba(42, 117, 187, 0.4); }
 .song-item.active { background: #2a75bb; border-color: #fff; }
 
 /* TRANSICIÓN */
@@ -46,16 +63,25 @@ body { margin: 0; background: #000; color: #fff; font-family: 'Segoe UI', sans-s
 }
 .transition-box {
   background: #111; padding: 40px; border-radius: 20px; border: 3px solid #4CAF50;
-  text-align: center; box-shadow: 0 0 20px #4CAF50;
+  text-align: center; animation: pulse 1.5s infinite;
+}
+@keyframes pulse {
+  0% { box-shadow: 0 0 10px #4CAF50; }
+  50% { box-shadow: 0 0 30px #4CAF50; }
+  100% { box-shadow: 0 0 10px #4CAF50; }
 }
 
-/* BATALLA (NIVEL 2) */
+/* BATALLA */
 #battle { 
     flex-direction: column; justify-content: center; align-items: center; 
     background: url('pikachu-pokemon.gif') center/cover no-repeat; 
 }
+#battle button:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 20px #ffcb05;
+}
 
-/* MENSAJE (NIVEL 3) */
+/* FINAL */
 #final { 
     justify-content: center; align-items: center; 
     background: url('Image-final.jpg') center/contain no-repeat #111; 
@@ -64,17 +90,48 @@ body { margin: 0; background: #000; color: #fff; font-family: 'Segoe UI', sans-s
   background: rgba(0,0,0,0.85); width: 85%; max-width: 550px; padding: 30px;
   border: 2px solid #ffcb05; border-radius: 20px; white-space: pre-wrap;
   box-shadow: 0 0 30px rgba(0,0,0,1); line-height: 1.6; font-size: 1.1rem;
+  animation: letterFade 1.5s ease;
+}
+@keyframes letterFade {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-/* TRAINER CARD (NIVEL 4) */
+/* TRAINER */
 #trainer { background: url('Trainer-card.png') center/contain no-repeat #000; }
 
+/* BOTONES */
 button { 
     padding: 15px 35px; cursor: pointer; background: #ffcb05; color: #2a75bb; 
     border: none; border-radius: 30px; font-weight: bold; letter-spacing: 1px;
-    box-shadow: 0 5px 0 #c7a008; transition: 0.1s;
+    box-shadow: 0 5px 0 #c7a008; transition: 0.1s; position: relative; overflow: hidden;
 }
 button:active { transform: translateY(3px); box-shadow: none; }
+
+button::after {
+  content: "";
+  position: absolute;
+  width: 300%;
+  height: 300%;
+  top: -100%;
+  left: -100%;
+  background: radial-gradient(circle, rgba(255,255,255,0.4), transparent 60%);
+  opacity: 0;
+  transition: 0.4s;
+}
+button:hover::after {
+  opacity: 1;
+  top: -50%;
+  left: -50%;
+}
+
+/* CONFETTI */
+#confetti {
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+}
 </style>
 </head>
 
@@ -84,6 +141,12 @@ button:active { transform: translateY(3px); box-shadow: none; }
 <audio id="music_game" src="just_the_way.mp3" loop></audio>
 <audio id="music_battle" src="gone.mp3" loop></audio>
 <audio id="music_final" src="extra.mp3" loop></audio>
+
+<!-- SFX -->
+<audio id="sfx_click" src="click.mp3"></audio>
+<audio id="sfx_hover" src="hover.mp3"></audio>
+<audio id="sfx_success" src="success.mp3"></audio>
+<audio id="sfx_error" src="error.mp3"></audio>
 
 <div id="menu" class="screen" style="display: flex;">
   <h1 style="font-size: 3.5rem; text-shadow: 4px 4px #2a75bb; -webkit-text-stroke: 2px white; text-align: center;">¡20 años de supervivencia!</h1>
@@ -133,7 +196,7 @@ button:active { transform: translateY(3px); box-shadow: none; }
 <div id="level-transition" class="screen">
   <div class="transition-box">
     <h2 id="trans-title">¡NIVEL SUPERADO!</h2>
-    <img id="transition-icon-img" class="transition-icon" src="" style="width: 100px;">
+    <img id="transition-icon-img" src="" style="width: 100px;">
     <br>
     <button onclick="goToNextLevel()">CONTINUAR AL NEXT LEVEL <span id="transition-next-num"></span></button>
   </div>
@@ -153,6 +216,8 @@ button:active { transform: translateY(3px); box-shadow: none; }
 <div id="trainer" class="screen">
     <button onclick="showLevels()" style="position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);">VOLVER AL MAPA</button>
 </div>
+
+<canvas id="confetti"></canvas>
 
 <script>
 let currentPlayingLevel = 1;
@@ -220,8 +285,10 @@ function choice(v) {
 
 function triggerFinalText() {
     const text = `Hola Yon... ♥\n\nFeliz cumpleaños.\n Pensaba escribirte algo súper profundo, pero ya sabes que no es lo mío, en fiin, Te amooo.\n Admiro mucho la persona increíble que eres.
-    \n Gracias por estar conmigo estos últimos años aunque a veces se complique todo, te seguiré escogiendo a tí una y mil veces<3
-    \n Felices 20 mi vidam. 🌸`;
+    
+ Gracias por estar conmigo estos últimos años aunque a veces se complique todo, te seguiré escogiendo a tí una y mil veces<3
+    
+ Felices 20 mi vidam. 🌸`;
     
     let i = 0;
     const box = document.getElementById("letter");
@@ -250,6 +317,68 @@ function playMusic(id, element) {
         element.classList.add('active');
     }
 }
+
+/* SFX */
+function playSFX(id) {
+    const sfx = document.getElementById(id);
+    if (sfx) {
+        sfx.currentTime = 0;
+        sfx.play().catch(()=>{});
+    }
+}
+
+document.querySelectorAll("button").forEach(btn => {
+    btn.addEventListener("mouseenter", () => playSFX("sfx_hover"));
+    btn.addEventListener("click", () => playSFX("sfx_click"));
+});
+
+const originalChoice = choice;
+choice = function(v) {
+    if (v === 999) playSFX("sfx_success");
+    else playSFX("sfx_error");
+    originalChoice(v);
+};
+
+const originalComplete = completeCurrentLevel;
+completeCurrentLevel = function() {
+    playSFX("sfx_success");
+    originalComplete();
+};
+
+/* CONFETTI */
+const canvas = document.getElementById("confetti");
+const ctx = canvas.getContext("2d");
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let confetti = [];
+for (let i = 0; i < 100; i++) {
+    confetti.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        r: Math.random() * 6 + 2,
+        d: Math.random() * 100
+    });
+}
+
+function drawConfetti() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "#ffcb05";
+    confetti.forEach(c => {
+        ctx.beginPath();
+        ctx.arc(c.x, c.y, c.r, 0, Math.PI * 2);
+        ctx.fill();
+    });
+    confetti.forEach(c => {
+        c.y += Math.cos(c.d) + 2;
+        if (c.y > canvas.height) {
+            c.y = 0;
+            c.x = Math.random() * canvas.width;
+        }
+    });
+}
+
+setInterval(drawConfetti, 30);
 </script>
 </body>
 </html>
