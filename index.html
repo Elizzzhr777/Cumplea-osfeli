@@ -10,24 +10,36 @@
 body { margin: 0; background: #000; color: #fff; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
 .screen { display: none; width: 100vw; height: 100vh; position: absolute; inset: 0; }
 
-/* MENU */
-#menu {
-  flex-direction: column; justify-content: center; align-items: center;
-  background: url('img-fondo1.gif') center/cover no-repeat;
-}
-
-/* SELECCIÓN DE NIVELES */
-#level-select {
+/* MENU & LEVELS */
+#menu, #level-select {
   flex-direction: column; justify-content: center; align-items: center;
   background: url('img-fondo1.gif') center/cover no-repeat;
 }
 .level-btn {
   width: 350px; display: flex; align-items: center; justify-content: flex-start; gap: 15px;
   margin-bottom: 15px; background: rgba(0,0,0,0.8); color: #ffcb05; 
-  border: 2px solid #ffcb05; padding: 10px; border-radius: 15px;
+  border: 2px solid #ffcb05; padding: 10px; border-radius: 15px; transition: 0.3s;
 }
 .level-btn img { width: 40px; height: 40px; object-fit: contain; }
 .locked { opacity: 0.5; filter: grayscale(100%); cursor: not-allowed; pointer-events: none; }
+
+/* 🎵 PLAYLIST UI (NIVEL 1) */
+#playlist-screen {
+  flex-direction: column; justify-content: center; align-items: center;
+  background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('img-fondo1.gif') center/cover no-repeat;
+}
+.playlist-container {
+  background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px);
+  padding: 30px; border-radius: 25px; border: 3px solid #ffcb05;
+  width: 80%; max-width: 450px; text-align: center;
+}
+.song-item {
+  background: rgba(0, 0, 0, 0.6); margin: 10px 0; padding: 15px;
+  border-radius: 15px; cursor: pointer; border: 1px solid transparent;
+  transition: 0.2s; display: flex; align-items: center; justify-content: space-between;
+}
+.song-item:hover { border-color: #ffcb05; background: rgba(42, 117, 187, 0.4); }
+.song-item.active { background: #2a75bb; border-color: #fff; }
 
 /* TRANSICIÓN DE NIVEL */
 #level-transition {
@@ -38,36 +50,15 @@ body { margin: 0; background: #000; color: #fff; font-family: 'Segoe UI', sans-s
   background: #111; padding: 40px; border-radius: 20px; border: 3px solid #4CAF50;
   text-align: center; box-shadow: 0 0 20px #4CAF50;
 }
-.transition-icon {
-  width: 120px; height: 120px; margin: 20px 0; border: 2px dashed #ffcb05; border-radius: 10px; object-fit: contain;
-}
 
-/* GAME UI */
-#game-container { width: 100%; height: 100%; cursor: none; }
-#hud { 
-    position: absolute; top: 20px; left: 20px; z-index: 100;
-    background: rgba(0,0,0,0.8); padding: 12px 25px; border-radius: 50px;
-    border: 2px solid #ffcb05; font-weight: bold; font-size: 14px;
-}
-
-/* BATTLE */
-#battle {
-  flex-direction: column; justify-content: center; align-items: center;
-  background: url('pikachu-pokemon.gif') center/cover no-repeat;
-}
-
-/* FINAL SCENE */
-#final {
-  justify-content: center; align-items: center;
-  background: url('Image-final.jpg') center/contain no-repeat #111;
-}
+/* BATTLE & FINAL */
+#battle { flex-direction: column; justify-content: center; align-items: center; background: url('pikachu-pokemon.gif') center/cover no-repeat; }
+#final { justify-content: center; align-items: center; background: url('Image-final.jpg') center/contain no-repeat #111; }
 #letter {
   background: rgba(0,0,0,0.85); width: 85%; max-width: 550px; padding: 30px;
   border: 2px solid #ffcb05; border-radius: 20px; white-space: pre-wrap;
   box-shadow: 0 0 30px rgba(0,0,0,1); line-height: 1.6;
 }
-
-/* TRAINER CARD */
 #trainer { background: url('Trainer-card.png') center/contain no-repeat #000; }
 
 button { 
@@ -87,7 +78,7 @@ button:active { transform: translateY(3px); box-shadow: none; }
 <audio id="music_final" src="extra.mp3" loop></audio>
 
 <div id="menu" class="screen" style="display: flex;">
-  <h1 style="font-size: 3.5rem; text-shadow: 4px 4px #2a75bb; -webkit-text-stroke: 2px white;">Aventura Pokémon para Yon</h1>
+  <h1 style="font-size: 3.5rem; text-shadow: 4px 4px #2a75bb; -webkit-text-stroke: 2px white;">¡20 años de supervivencia!</h1>
   <button onclick="showLevels()">INICIAR AVENTURA</button>
 </div>
 
@@ -95,7 +86,7 @@ button:active { transform: translateY(3px); box-shadow: none; }
   <h2 style="font-size: 2.5rem; color: #ffcb05;">MAPA DE NIVELES</h2>
   <div style="display: flex; flex-direction: column; gap: 10px;">
     <button id="btn-lvl1" class="level-btn" onclick="startSpecificLevel(1)">
-      <img src="icono-nivel-1.png"> NIVEL 1: Exploración
+      <img src="icono-nivel-1.png"> NIVEL 1: Poké-Playlist
     </button>
     <button id="btn-lvl2" class="level-btn locked" onclick="startSpecificLevel(2)">
       <img src="icono-nivel-2.png"> NIVEL 2: Batalla
@@ -109,18 +100,41 @@ button:active { transform: translateY(3px); box-shadow: none; }
   </div>
 </div>
 
-<div id="level-transition" class="screen">
-  <div class="transition-box">
-    <h2 id="trans-title">¡NIVEL SUPERADO!</h2>
-    <img id="transition-icon-img" class="transition-icon" src="">
-    <br>
-    <button onclick="goToNextLevel()">CONTINUAR AL NIVEL <span id="transition-next-num"></span></button>
+<div id="playlist-screen" class="screen">
+  <div class="playlist-container">
+    <h2 style="color: #ffcb05; margin-bottom: 20px;">🎵 REPRODUCTOR DE YON</h2>
+    
+    <div class="song-item" onclick="playMusic('music_menu', this)">
+      <span>☁️ Cloud 9</span>
+      <small>▶️</small>
+    </div>
+    <div class="song-item" onclick="playMusic('music_game', this)">
+      <span>✨ Just the Way</span>
+      <small>▶️</small>
+    </div>
+    <div class="song-item" onclick="playMusic('music_battle', this)">
+      <span>🔥 Gone</span>
+      <small>▶️</small>
+    </div>
+    <div class="song-item" onclick="playMusic('music_final', this)">
+      <span>🌸 Extra Theme</span>
+      <small>▶️</small>
+    </div>
+
+    <br><br>
+    <button onclick="completeCurrentLevel()" style="background: #4CAF50; color: white; box-shadow: 0 5px 0 #2e6631;">
+      LISTO PARA LA BATALLA ⚔️
+    </button>
   </div>
 </div>
 
-<div id="game" class="screen">
-  <div id="hud">✨ AMOR: <span id="love">0</span></div>
-  <div id="game-container"></div>
+<div id="level-transition" class="screen">
+  <div class="transition-box">
+    <h2 id="trans-title">¡NIVEL SUPERADO!</h2>
+    <img id="transition-icon-img" class="transition-icon" src="" style="width: 100px;">
+    <br>
+    <button onclick="goToNextLevel()">CONTINUAR AL NIVEL <span id="transition-next-num"></span></button>
+  </div>
 </div>
 
 <div id="battle" class="screen">
@@ -135,8 +149,7 @@ button:active { transform: translateY(3px); box-shadow: none; }
 <div id="trainer" class="screen"></div>
 
 <script>
-let scene, camera, renderer, yon3D, pika3D;
-let mode = "menu", love = 0, moveForward = false;
+let mode = "menu", love = 0;
 let highestUnlockedLevel = 1, currentPlayingLevel = 1;
 
 function showLevels() {
@@ -146,17 +159,15 @@ function showLevels() {
         let btn = document.getElementById("btn-lvl"+i);
         if(i <= highestUnlockedLevel) { btn.classList.remove("locked"); btn.disabled = false; }
     }
-    playMusic("music_menu");
+    // No reseteamos la música aquí para que la playlist siga sonando si se eligió algo
 }
 
 function startSpecificLevel(level) {
     hideAllScreens();
     currentPlayingLevel = level;
     if(level === 1) {
-        document.getElementById("game").style.display = "block";
-        if (!scene) initEngine();
-        playMusic("music_game");
-        mode = "game";
+        document.getElementById("playlist-screen").style.display = "flex";
+        mode = "playlist";
     } else if(level === 2) {
         document.getElementById("battle").style.display = "flex";
         playMusic("music_battle");
@@ -167,72 +178,6 @@ function startSpecificLevel(level) {
     } else if(level === 4) {
         document.getElementById("trainer").style.display = "flex";
     }
-}
-
-function initEngine() {
-    scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x87CEEB); 
-
-    camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 1000);
-    renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    document.getElementById('game-container').appendChild(renderer.domElement);
-
-    const groundGeo = new THREE.PlaneGeometry(500, 500);
-    const groundMat = new THREE.MeshToonMaterial({ color: 0x4CAF50 });
-    const ground = new THREE.Mesh(groundGeo, groundMat);
-    ground.rotation.x = -Math.PI / 2;
-    scene.add(ground);
-
-    scene.add(new THREE.AmbientLight(0xffffff, 0.8));
-    const sun = new THREE.DirectionalLight(0xffffff, 1);
-    sun.position.set(5, 10, 7);
-    scene.add(sun);
-
-    // --- CARGA DE MODELOS 3D ---
-    const loader = new THREE.GLTFLoader();
-
-    // Línea 174: Cargar a YON (Protagonista)
-    loader.load('Hitem3d-1777390520423.glb', (gltf) => {
-        yon3D = gltf.scene;
-        yon3D.scale.set(1.5, 1.5, 1.5);
-        yon3D.position.y = 0;
-        scene.add(yon3D);
-    });
-
-    // Línea 184: Cargar a PIKACHU (Acompañante)
-    loader.load('Hitem3d-1777391060652.glb', (gltf) => {
-        pika3D = gltf.scene;
-        pika3D.scale.set(0.8, 0.8, 0.8);
-        pika3D.position.set(1.5, 0, 1);
-        scene.add(pika3D);
-    });
-
-    camera.position.set(0, 5, 10);
-    animate();
-}
-
-function animate() {
-    if (mode !== "game") return;
-    requestAnimationFrame(animate);
-    
-    if (moveForward && yon3D) {
-        yon3D.position.z -= 0.15;
-        camera.position.z -= 0.15;
-        
-        // Pikachu sigue a Yon suavemente
-        if(pika3D) {
-            pika3D.position.lerp(new THREE.Vector3(yon3D.position.x + 1.2, 0, yon3D.position.z + 1.5), 0.1);
-            pika3D.lookAt(yon3D.position);
-        }
-
-        if(Math.random() < 0.01) {
-            moveForward = false;
-            completeCurrentLevel();
-        }
-    }
-    if(yon3D) camera.lookAt(yon3D.position);
-    renderer.render(scene, camera);
 }
 
 function completeCurrentLevel() {
@@ -257,12 +202,12 @@ function hideAllScreens() {
 
 function choice(v) {
     if (v === 999) completeCurrentLevel();
-    else { love += v; document.getElementById("love").innerText = love; }
+    else { love += v; }
 }
 
 function triggerFinalText() {
-    const text = `Hola Yon... ♥\n\nFeliz cumpleaños.\n Pensaba escribirte algo súper profundo, pero ya sabes que no es lo mío, en fiin, Te amooo.\n Y admiro la persona increíble que eres.
-    \n\n Gracias por estar conmigo estos ultimosúltimos años aunque a veces se complique todo, te seguiré escogiendo a tí una y mil veces<3
+    const text = `Hola Yon... ♥\n\nFeliz cumpleaños.\n Pensaba escribirte algo súper profundo, pero ya sabes que no es lo mío, en fiin, Te amooo.\n Y admiro mucho la persona increíble que eres.
+    \n\n Gracias por estar conmigo estos últimos años aunque a veces se complique todo, te seguiré escogiendo a tí una y mil veces<3
     \n Felices 20 mi vidam. 🌸`;
     let i = 0;
     const box = document.getElementById("letter");
@@ -276,13 +221,21 @@ function triggerFinalText() {
     }, 50);
 }
 
-function playMusic(id) {
-    document.querySelectorAll('audio').forEach(a => { a.pause(); a.currentTime = 0; });
-    document.getElementById(id).play().catch(()=>{});
-}
+// Función de música actualizada para manejar la UI de la playlist
+function playMusic(id, element) {
+    document.querySelectorAll('audio').forEach(a => { a.pause(); });
+    const track = document.getElementById(id);
+    if(track) {
+        track.currentTime = 0;
+        track.play().catch(()=>{});
+    }
 
-window.addEventListener('keydown', e => { if (e.key === "ArrowUp") moveForward = true; });
-window.addEventListener('keyup', e => { if (e.key === "ArrowUp") moveForward = false; });
+    // Si viene de la playlist, marcamos el item como activo
+    if(element) {
+        document.querySelectorAll('.song-item').forEach(item => item.classList.remove('active'));
+        element.classList.add('active');
+    }
+}
 </script>
 </body>
 </html>
