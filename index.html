@@ -32,21 +32,9 @@ button, .song-item, .level-btn, #trainer-card {
 }
 
 @keyframes titleGlow {
-  0%, 100% { 
-    /* Borde negro de 2px en todas las direcciones + sombra + brillo amarillo */
-    text-shadow: 
-      2px 2px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000,
-      0px 2px 0 #000, 0px -2px 0 #000, 2px 0px 0 #000, -2px 0px 0 #000,
-      4px 4px 0 #000,
-      0 0 12px rgba(255,203,5,0.6); 
-  }
-    50% { 
-    /* Mismo borde, pero el brillo amarillo se hace más grande */
-    text-shadow: 
-      2px 2px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000,
-      0px 2px 0 #000, 0px -2px 0 #000, 2px 0px 0 #000, -2px 0px 0 #000,
-      4px 4px 0 #000,
-      0 0 28px rgba(255,203,5,1); 
+  0%, 100% { filter: drop-shadow(0 0 12px rgba(255,203,5,0.6)); }
+  50% { filter: drop-shadow(0 0 28px rgba(255,203,5,1)); }
+}
 
 @keyframes pulseBorder {
   0%, 100% { box-shadow: 0 0 15px rgba(255,203,5,0.5), inset 0 0 15px rgba(255,203,5,0.1); }
@@ -84,17 +72,35 @@ button, .song-item, .level-btn, #trainer-card {
 
 /* 🌟 TÍTULOS ESTILO LOGO POKÉMON (degradado amarillo→dorado + borde azul) */
 h1, h2 {
+  position: relative;
+  display: inline-block;
   background: linear-gradient(180deg, #ffeb3b 0%, #ffcb05 45%, #d4a017 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  color: transparent;
   font-weight: 900;
   letter-spacing: 2px;
-  -webkit-text-stroke: 0; /* Esto asegura que NADA de negro ensucie el amarillo por dentro */
+  z-index: 1;
+  /* Eliminamos text-shadow y stroke de aquí para que el centro sea puro oro */
+  text-shadow: none;
+  -webkit-text-stroke: 0;
   animation: titleGlow 2.5s ease-in-out infinite;
 }
-       
+
+/* El "Guardaespaldas": Este crea el borde negro por DETRÁS */
+h1::before, h2::before {
+  content: attr(data-text); /* Necesitas añadir data-text="TU TITULO" en el HTML */
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  -webkit-text-stroke: 6px #000000; /* Borde negro grueso */
+  -webkit-text-fill-color: #000000;
+  text-shadow: 4px 4px 0px #000000; /* Sombra sólida */
+}
+
 /* ============================================
    📺 PANTALLA: MENÚ INICIO
    👉 Reemplaza: fondo-inicio.gif
@@ -516,7 +522,7 @@ function choice(v) {
 }
 
 function triggerFinalText() {
-    const text = `Hola Yon... Así que escogiste amarme por siempre... ♥\n\nJiji, feliz cumpleaños.\n Pensaba escribirte algo súper profundo, pero ya sabes que no es lo mío, en fiin, Te amooo.
+    const text = `Hola Yon... Así que escogiste amarme por siempre... ♥️\n\nJiji, feliz cumpleaños.\n Pensaba escribirte algo súper profundo, pero ya sabes que no es lo mío, en fiin, Te amooo.
     \n Admiro mucho la persona increíble que eres, gracias por compartir conmigo tus gustos, disgustos y hasta tus silencios.
     \n\n Y finalemente, Gracias también por estar conmigo estos últimos años, ten muy presente que aunque a veces todo se complique te seguiré escogiendo a tí una y mil veces más.<3
     \n Felices 20 mi vidam. 🌸`;
@@ -542,7 +548,7 @@ function triggerFinalText() {
           document.head.appendChild(s);
         }
         document.getElementById('final-dyn-style').textContent =
-          `#final::before { opacity: ${pseudoOpacity}; }`;
+          #final::before { opacity: ${pseudoOpacity}; };
         
         if (i >= text.length) {
             clearInterval(interval);
@@ -603,7 +609,7 @@ function initTrainerCardTilt() {
         const py = y / rect.height;  // 0..1
         const rotY = (px - 0.5) * 22; // grados
         const rotX = (0.5 - py) * 22;
-        card.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg) scale(1.03)`;
+        card.style.transform = rotateX(${rotX}deg) rotateY(${rotY}deg) scale(1.03);
         card.style.setProperty('--mx', (px * 100) + '%');
         card.style.setProperty('--my', (py * 100) + '%');
     };
@@ -628,7 +634,7 @@ function startFinalParticles() {
   window.addEventListener('resize', resize);
   
   const particles = [];
-  const symbols = ['♥', '✦', '✧', '🌸', '·'];
+  const symbols = ['♥️', '✦', '✧', '🌸', '·'];
   const colors = ['#ffcb05', '#ff6fa1', '#ffffff', '#ffd6e0', '#ffe680'];
   
   function spawn() {
@@ -664,7 +670,7 @@ function startFinalParticles() {
       ctx.globalAlpha = Math.max(0, p.alpha);
       ctx.fillStyle = p.color;
       ctx.shadowBlur = 12; ctx.shadowColor = p.color;
-      ctx.font = `${p.size}px serif`;
+      ctx.font = ${p.size}px serif;
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
       ctx.fillText(p.symbol, 0, 0);
       ctx.restore();
@@ -679,4 +685,3 @@ function startFinalParticles() {
 </script>
 </body>
 </html>
-
