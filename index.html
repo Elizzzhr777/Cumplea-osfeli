@@ -4,7 +4,26 @@
 <meta charset="UTF-8">
 <title>Aventura Pokémon para Yon</title>
 <style>
-body { margin: 0; background: #000; color: #fff; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
+/* ============================================
+   🎨 FONDOS ANIMADOS - REEMPLAZA ESTOS GIFS
+   ============================================
+   Solo cambia los nombres de archivo .gif por los tuyos.
+   Todos los fondos están configurados como FULL SCREEN
+   (cover + center) para que no se deformen.
+   ============================================ */
+
+body { 
+  margin: 0; background: #000; color: #fff; 
+  font-family: 'Segoe UI', sans-serif; overflow: hidden;
+  /* 🖱️ CURSOR POKÉBALL PERSONALIZADO */
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><circle cx='16' cy='16' r='14' fill='white' stroke='black' stroke-width='2'/><path d='M2 16 H30' stroke='black' stroke-width='3'/><path d='M2 16 A14 14 0 0 1 30 16 Z' fill='%23ee1515'/><circle cx='16' cy='16' r='4' fill='white' stroke='black' stroke-width='2'/><circle cx='16' cy='16' r='1.5' fill='black'/></svg>") 16 16, auto;
+}
+
+/* Cursor especial al pasar sobre botones (Pokéball abierta/grande) */
+button, .song-item, .level-btn, #trainer-card {
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 32 32'><circle cx='16' cy='16' r='14' fill='%23ffcb05' stroke='black' stroke-width='2'/><path d='M2 16 H30' stroke='black' stroke-width='3'/><path d='M2 16 A14 14 0 0 1 30 16 Z' fill='%23ee1515'/><circle cx='16' cy='16' r='5' fill='white' stroke='black' stroke-width='2'/><circle cx='16' cy='16' r='2' fill='%232a75bb'/></svg>") 20 20, pointer !important;
+}
+
 .screen { display: none; width: 100vw; height: 100vh; position: absolute; inset: 0; animation: screenFade 0.6s ease; }
 
 @keyframes screenFade {
@@ -13,8 +32,8 @@ body { margin: 0; background: #000; color: #fff; font-family: 'Segoe UI', sans-s
 }
 
 @keyframes titleGlow {
-  0%, 100% { text-shadow: 4px 4px #2a75bb, 0 0 20px rgba(255,203,5,0.6); }
-  50% { text-shadow: 4px 4px #2a75bb, 0 0 40px rgba(255,203,5,1), 0 0 60px rgba(255,203,5,0.7); }
+  0%, 100% { filter: drop-shadow(0 0 12px rgba(255,203,5,0.6)); }
+  50% { filter: drop-shadow(0 0 28px rgba(255,203,5,1)); }
 }
 
 @keyframes pulseBorder {
@@ -38,13 +57,68 @@ body { margin: 0; background: #000; color: #fff; font-family: 'Segoe UI', sans-s
   100% { background-position: 200% 0; }
 }
 
-/* MENÚ Y MAPA */
-#menu, #level-select {
-  flex-direction: column; justify-content: center; align-items: center;
-  background: url('img-fondo1.gif') center/cover no-repeat;
+/* 🎉 SALTO DE ALEGRÍA + DESTELLO BATALLA */
+@keyframes joyJump {
+  0% { transform: translateY(0) scale(1); }
+  30% { transform: translateY(-40px) scale(1.08); }
+  60% { transform: translateY(-10px) scale(0.95); }
+  100% { transform: translateY(0) scale(1); }
+}
+@keyframes flashWhite {
+  0% { background: rgba(255,255,255,0); }
+  40% { background: rgba(255,255,255,0.95); }
+  100% { background: rgba(255,255,255,0); }
 }
 
-#menu h1 { animation: titleGlow 2.5s ease-in-out infinite; }
+/* 🌟 TÍTULOS ESTILO LOGO POKÉMON (degradado amarillo→dorado + borde azul) */
+h1, h2 {
+  position: relative;
+  display: inline-block;
+  background: linear-gradient(180deg, #ffeb3b 0%, #ffcb05 45%, #d4a017 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 900;
+  letter-spacing: 2px;
+  z-index: 1;
+  /* Eliminamos text-shadow y stroke de aquí para que el centro sea puro oro */
+  text-shadow: none;
+  -webkit-text-stroke: 0;
+  animation: titleGlow 2.5s ease-in-out infinite;
+}
+
+/* El "Guardaespaldas": Este crea el borde negro por DETRÁS */
+h1::before, h2::before {
+  content: attr(data-text); /* Necesitas añadir data-text="TU TITULO" en el HTML */
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  -webkit-text-stroke: 6px #000000; /* Borde negro grueso */
+  -webkit-text-fill-color: #000000;
+  text-shadow: 4px 4px 0px #000000; /* Sombra sólida */
+}
+
+/* ============================================
+   📺 PANTALLA: MENÚ INICIO
+   👉 Reemplaza: fondo-inicio.gif
+   ============================================ */
+#menu {
+  display: none;
+  flex-direction: column; justify-content: center; align-items: center;
+  background: url('img-fondo1.gif') center center / cover no-repeat;
+}
+
+/* ============================================
+   📺 PANTALLA: MAPA DE NIVELES
+   👉 Reemplaza: fondo-mapa.gif
+   ============================================ */
+#level-select {
+  flex-direction: column; justify-content: center; align-items: center;
+  background: url('img-fondo2.gif') center center / cover no-repeat;
+}
 
 .level-btn {
   width: 350px; display: flex; align-items: center; justify-content: flex-start; gap: 15px;
@@ -62,10 +136,13 @@ body { margin: 0; background: #000; color: #fff; font-family: 'Segoe UI', sans-s
 .level-btn img { width: 40px; height: 40px; object-fit: contain; animation: floaty 2.2s ease-in-out infinite; }
 .locked { opacity: 0.5; filter: grayscale(100%); cursor: not-allowed; pointer-events: none; }
 
-/* 🎵 PLAYLIST (NIVEL 1) */
+/* ============================================
+   📺 PANTALLA: PLAYLIST (NIVEL 1)
+   👉 Reemplaza: fondo-playlist.gif
+   ============================================ */
 #playlist-screen {
   flex-direction: column; justify-content: center; align-items: center;
-  background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('img-fondo1.gif') center/cover no-repeat;
+  background: linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.55)), url('img-fondo4.gif') center center / cover no-repeat;
 }
 .playlist-container {
   background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px);
@@ -75,7 +152,7 @@ body { margin: 0; background: #000; color: #fff; font-family: 'Segoe UI', sans-s
 }
 .song-item {
   background: rgba(0, 0, 0, 0.6); margin: 8px 0; padding: 12px;
-  border-radius: 15px; cursor: pointer; border: 1px solid transparent;
+  border-radius: 15px; border: 1px solid transparent;
   transition: 0.25s; display: flex; align-items: center; justify-content: space-between;
 }
 .song-item:hover { border-color: #ffcb05; background: rgba(42, 117, 187, 0.4); transform: translateX(6px) scale(1.02); }
@@ -86,7 +163,7 @@ body { margin: 0; background: #000; color: #fff; font-family: 'Segoe UI', sans-s
   animation: shimmer 2s linear infinite;
 }
 
-/* TRANSICIÓN */
+/* TRANSICIÓN ENTRE NIVELES */
 #level-transition {
   flex-direction: column; justify-content: center; align-items: center;
   background: rgba(0,0,0,0.9); z-index: 200;
@@ -98,27 +175,36 @@ body { margin: 0; background: #000; color: #fff; font-family: 'Segoe UI', sans-s
 }
 .transition-icon { animation: floaty 1.6s ease-in-out infinite; filter: drop-shadow(0 0 12px #4CAF50); }
 
-/* BATALLA (NIVEL 2) */
+/* ============================================
+   📺 PANTALLA: BATALLA (NIVEL 2)
+   👉 Reemplaza: fondo-batalla.gif
+   ============================================ */
 #battle { 
-    flex-direction: column; justify-content: center; align-items: center; 
-    background: url('pikachu-pokemon.gif') center/cover no-repeat; 
+  flex-direction: column; justify-content: center; align-items: center; 
+  background: url('img-fondo3.gif') center center / cover no-repeat;
+  position: relative;
 }
-#battle > div { animation: pulseBorder 2.5s ease-in-out infinite; }
+#battle > div { animation: pulseBorder 2.5s ease-in-out infinite; position: relative; z-index: 2; }
+#battle.jumping > div { animation: joyJump 0.9s ease forwards !important; }
+#battle-flash {
+  position: absolute; inset: 0; pointer-events: none; z-index: 5;
+  background: rgba(255,255,255,0); 
+}
+#battle-flash.active { animation: flashWhite 0.8s ease forwards; }
 
-/* MENSAJE (NIVEL 3) */
+/* ============================================
+   📺 PANTALLA: CARTA FINAL (NIVEL 3)
+   👉 Reemplaza: fondo-carta.gif
+   (la imagen Image-final.jpg sigue apareciendo
+    progresivamente sobre este fondo)
+   ============================================ */
 #final { 
-    justify-content: center; align-items: center; 
-    background: url('Image-final.jpg') center/contain no-repeat #111; 
-    background-color: #111;
-    transition: opacity 0.4s ease;
-    position: relative;
+  justify-content: center; align-items: center; 
+  background: url('img-fondo5.gif') center center / cover no-repeat #111; 
+  transition: opacity 0.4s ease;
+  position: relative;
 }
-#final::before {
-  content: ''; position: absolute; inset: 0;
-  background: url('Image-final.jpg') center/contain no-repeat;
-  opacity: 0; transition: opacity 0.5s ease;
-  pointer-events: none;
-}
+   
 #letter {
   background: rgba(0,0,0,0.85); width: 85%; max-width: 550px; padding: 30px;
   border: 2px solid #ffcb05; border-radius: 20px; white-space: pre-wrap;
@@ -131,14 +217,88 @@ body { margin: 0; background: #000; color: #fff; font-family: 'Segoe UI', sans-s
   pointer-events: none; z-index: 1;
 }
 
-/* TRAINER CARD (NIVEL 4) */
-#trainer { background: url('Trainer-card.png') center/contain no-repeat #000; }
+/* ============================================
+   📺 PANTALLA: TRAINER CARD (NIVEL 4)
+   👉 Reemplaza: fondo-trainer.gif
+   (Trainer-card.png se usa como base de la carta)
+   ============================================ */
+#trainer { 
+  justify-content: center; align-items: center;
+  background: url('img-fondo6.gif') center center / cover no-repeat #000;
+  perspective: 1200px;
+  position: relative;
+}
+
+/* 🃏 TRAINER CARD HOLOGRÁFICA + TILT 3D */
+#trainer-card {
+  position: relative;
+  width: min(85vw, 420px);
+  aspect-ratio: 3 / 4;
+  border-radius: 20px;
+  background: url('trainer-card.png') center/cover no-repeat;
+  box-shadow: 0 25px 60px rgba(0,0,0,0.8), 0 0 30px rgba(255,203,5,0.4);
+  transform-style: preserve-3d;
+  transition: transform 0.15s ease-out;
+  overflow: hidden;
+  border: 3px solid #ffcb05;
+}
+/* Brillo holográfico que sigue al cursor */
+#trainer-card::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(
+    circle at var(--mx, 50%) var(--my, 50%),
+    rgba(255,255,255,0.55) 0%,
+    rgba(255,203,5,0.25) 25%,
+    rgba(42,117,187,0.15) 45%,
+    transparent 70%
+  );
+  mix-blend-mode: overlay;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+/* Capa holo con franjas iridiscentes */
+#trainer-card::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(
+    115deg,
+    transparent 30%,
+    rgba(255,0,150,0.25) 40%,
+    rgba(0,200,255,0.25) 50%,
+    rgba(255,255,0,0.25) 60%,
+    transparent 70%
+  );
+  background-size: 200% 200%;
+  background-position: var(--mx, 50%) var(--my, 50%);
+  mix-blend-mode: color-dodge;
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+/* Textos pixel sobre la carta */
+.trainer-info {
+  position: absolute;
+  left: 50%; transform: translateX(-50%);
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+  color: #fff;
+  text-shadow: 2px 2px 0 #2a75bb, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+  letter-spacing: 2px;
+  font-size: clamp(0.9rem, 2.2vw, 1.1rem);
+  z-index: 3;
+  pointer-events: none;
+  white-space: nowrap;
+}
+#trainer-name { top: 12%; }
+#trainer-level { top: 22%; color: #ffcb05; }
+#trainer-badges { bottom: 14%; color: #ff6fa1; }
 
 button { 
-    padding: 15px 35px; cursor: pointer; background: #ffcb05; color: #2a75bb; 
-    border: none; border-radius: 30px; font-weight: bold; letter-spacing: 1px;
-    box-shadow: 0 5px 0 #c7a008; transition: 0.15s;
-    position: relative; overflow: hidden;
+  padding: 15px 35px; background: #ffcb05; color: #2a75bb; 
+  border: none; border-radius: 30px; font-weight: bold; letter-spacing: 1px;
+  box-shadow: 0 5px 0 #c7a008; transition: 0.15s;
+  position: relative; overflow: hidden;
 }
 button:hover { transform: translateY(-2px); box-shadow: 0 7px 0 #c7a008, 0 0 20px rgba(255,203,5,0.6); }
 button:active { transform: translateY(3px); box-shadow: none; }
@@ -159,12 +319,12 @@ button:active::after { width: 300px; height: 300px; transition: 0s; }
 <audio id="music_6" src="i Wanna Be Yours.mp3" loop></audio>
 
 <div id="menu" class="screen" style="display: flex;">
-  <h1 style="font-size: 3.5rem; text-shadow: 4px 4px #2a75bb; -webkit-text-stroke: 2px white; text-align: center;">¡20 años de supervivencia!</h1>
+  <h1 style="font-size: 3.5rem; text-align: center;">¡20 años de supervivencia!</h1>
   <button onclick="showLevels()">INICIAR AVENTURA</button>
 </div>
 
 <div id="level-select" class="screen">
-  <h2 style="font-size: 2.5rem; color: #ffcb05; text-shadow: 2px 2px #000;">MAPA DE NIVELES</h2>
+  <h2 style="font-size: 2.5rem;">MAPA DE NIVELES</h2>
   <div style="display: flex; flex-direction: column; gap: 10px;">
     <button id="btn-lvl1" class="level-btn" onclick="startSpecificLevel(1)">
       <img src="icono-nivel-1.gif"> NIVEL 1: Poké-Playlist
@@ -183,7 +343,7 @@ button:active::after { width: 300px; height: 300px; transition: 0s; }
 
 <div id="playlist-screen" class="screen">
   <div class="playlist-container">
-    <h2 style="color: #ffcb05; margin-bottom: 15px;">🎵 Músicas que me recuerdan a ti</h2>
+    <h2 style="margin-bottom: 15px;">🎵 Músicas que me recuerdan a ti</h2>
     <div class="song-item" onclick="playMusic('music_menu', this)">
       <span>☁️ Cloud 9-Beach Bunny</span> <small>▶️</small>
     </div>
@@ -219,8 +379,9 @@ button:active::after { width: 300px; height: 300px; transition: 0s; }
 </div>
 
 <div id="battle" class="screen">
+  <div id="battle-flash"></div>
   <div style="background:rgba(0,0,0,0.85); padding:40px; border-radius:25px; border:3px solid #ffcb05; text-align: center;">
-    <h2 style="color:#ffcb05; margin-top:0; font-size: 2rem;">¡BATALLA EMO-CIONAL!</h2>
+    <h2 style="margin-top:0; font-size: 2rem;">¡BATALLA EMO-CIONAL!</h2>
     <p style="font-size: 1.2rem; margin-bottom: 30px;">¿Qué harás ahora?</p>
     <button onclick="choice(999)">⚡ AMARME X100PRE</button><br><br>
     <button onclick="choice(1)" style="background:#fff; color:#333;"> ¿¡DUDAR!?</button>
@@ -233,7 +394,12 @@ button:active::after { width: 300px; height: 300px; transition: 0s; }
 </div>
 
 <div id="trainer" class="screen">
-    <button onclick="showLevels()" style="position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);">VOLVER AL MAPA</button>
+  <div id="trainer-card">
+    <div class="trainer-info" id="trainer-name">Entrenador: Yon</div>
+    <div class="trainer-info" id="trainer-level">Nivel: 20</div>
+    <div class="trainer-info" id="trainer-badges">Medallas: Amor Infinito</div>
+  </div>
+  <button onclick="showLevels()" style="position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);">VOLVER AL MAPA</button>
 </div>
 
 <script>
@@ -304,13 +470,12 @@ function startSpecificLevel(level) {
     } else if(level === 3) {
         const finalScreen = document.getElementById("final");
         finalScreen.style.display = "flex";
-        finalScreen.style.backgroundImage = "none";
-        finalScreen.style.backgroundColor = "#111";
         playMusic('music_final');
         startFinalParticles();
         triggerFinalText();
     } else if(level === 4) {
         document.getElementById("trainer").style.display = "flex";
+        initTrainerCardTilt();
     }
 }
 
@@ -334,9 +499,20 @@ function goToNextLevel() {
 
 function choice(v) {
     if (v === 999) {
-        completeCurrentLevel();
+        /* 🎉 SALTO DE ALEGRÍA + DESTELLO ANTES DE PASAR */
+        const battleScreen = document.getElementById('battle');
+        const flash = document.getElementById('battle-flash');
+        battleScreen.classList.add('jumping');
+        flash.classList.add('active');
+        playTone(880, 0.12, 'square', 0.18);
+        setTimeout(() => playTone(1320, 0.18, 'square', 0.16), 120);
+        setTimeout(() => {
+          battleScreen.classList.remove('jumping');
+          flash.classList.remove('active');
+          completeCurrentLevel();
+        }, 900);
     } else {
-        const battleBox = document.querySelector('#battle > div');
+        const battleBox = document.querySelector('#battle > div:not(#battle-flash)');
         if (battleBox) {
           battleBox.style.animation = 'shake 0.4s';
           setTimeout(() => battleBox.style.animation = 'pulseBorder 2.5s ease-in-out infinite', 400);
@@ -346,7 +522,7 @@ function choice(v) {
 }
 
 function triggerFinalText() {
-    const text = `Hola Yon... Así que escogiste amarme por siempre... ♥\n\nJiji, feliz cumpleaños.\n Pensaba escribirte algo súper profundo, pero ya sabes que no es lo mío, en fiin, Te amooo.
+    const text = `Hola Yon... Así que escogiste amarme por siempre... ♥️\n\nJiji, feliz cumpleaños.\n Pensaba escribirte algo súper profundo, pero ya sabes que no es lo mío, en fiin, Te amooo.
     \n Admiro mucho la persona increíble que eres, gracias por compartir conmigo tus gustos, disgustos y hasta tus silencios.
     \n\n Y finalemente, Gracias también por estar conmigo estos últimos años, ten muy presente que aunque a veces todo se complique te seguiré escogiendo a tí una y mil veces más.<3
     \n Felices 20 mi vidam. 🌸`;
@@ -355,17 +531,24 @@ function triggerFinalText() {
     const box = document.getElementById("letter");
     const finalScreen = document.getElementById("final");
     box.textContent = "";
-    finalScreen.style.backgroundImage = "url('Image-final.jpg')";
-    finalScreen.style.backgroundColor = "#111";
     
     const interval = setInterval(() => {
         box.textContent += text[i];
         i++;
-        // Aparición sutil y progresiva de la imagen final
+        // Aparición sutil y progresiva de Image-final.jpg sobre el GIF de fondo
         const p = Math.min(1, i / text.length);
-        // overlay de oscuridad sobre la imagen va disminuyendo conforme avanza la carta
-        const darkness = (1 - p) * 0.95;
-        finalScreen.style.boxShadow = `inset 0 0 0 9999px rgba(17,17,17,${darkness.toFixed(3)})`;
+        const beforeEl = finalScreen;
+        // usamos pseudo ::before vía variable: aplicamos opacidad mediante boxShadow + ::before opacity
+        const pseudoOpacity = (p * 0.9).toFixed(3);
+        finalScreen.style.setProperty('--final-img-opacity', pseudoOpacity);
+        // forzamos el ::before vía estilo dinámico
+        if (!document.getElementById('final-dyn-style')) {
+          const s = document.createElement('style');
+          s.id = 'final-dyn-style';
+          document.head.appendChild(s);
+        }
+        document.getElementById('final-dyn-style').textContent =
+          #final::before { opacity: ${pseudoOpacity}; };
         
         if (i >= text.length) {
             clearInterval(interval);
@@ -374,17 +557,71 @@ function triggerFinalText() {
     }, 50);
 }
 
+/* === 🎚️ CROSSFADE DE AUDIO (500ms) === */
 function playMusic(id, element) {
-    document.querySelectorAll('audio').forEach(a => { a.pause(); });
-    const track = document.getElementById(id);
-    if(track) {
-        track.currentTime = 0;
-        track.play().catch(()=>{});
+    const FADE = 500; // ms
+    const STEPS = 20;
+    const interval = FADE / STEPS;
+    const target = document.getElementById(id);
+    const others = Array.from(document.querySelectorAll('audio')).filter(a => a !== target);
+
+    // Fade out de las demás pistas
+    others.forEach(a => {
+        if (a.paused) return;
+        const startVol = a.volume;
+        let step = 0;
+        const fo = setInterval(() => {
+            step++;
+            a.volume = Math.max(0, startVol * (1 - step / STEPS));
+            if (step >= STEPS) { clearInterval(fo); a.pause(); a.volume = 1; }
+        }, interval);
+    });
+
+    // Fade in de la nueva
+    if (target) {
+        target.currentTime = 0;
+        target.volume = 0;
+        target.play().catch(()=>{});
+        let step = 0;
+        const fi = setInterval(() => {
+            step++;
+            target.volume = Math.min(1, step / STEPS);
+            if (step >= STEPS) clearInterval(fi);
+        }, interval);
     }
-    if(element) {
+    if (element) {
         document.querySelectorAll('.song-item').forEach(item => item.classList.remove('active'));
         element.classList.add('active');
     }
+}
+
+/* === 🃏 TRAINER CARD: TILT 3D + BRILLO HOLOGRÁFICO === */
+function initTrainerCardTilt() {
+    const card = document.getElementById('trainer-card');
+    if (!card || card.dataset.tiltInit) return;
+    card.dataset.tiltInit = "1";
+
+    const onMove = (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = (e.clientX ?? (e.touches && e.touches[0].clientX)) - rect.left;
+        const y = (e.clientY ?? (e.touches && e.touches[0].clientY)) - rect.top;
+        const px = x / rect.width;   // 0..1
+        const py = y / rect.height;  // 0..1
+        const rotY = (px - 0.5) * 22; // grados
+        const rotX = (0.5 - py) * 22;
+        card.style.transform = rotateX(${rotX}deg) rotateY(${rotY}deg) scale(1.03);
+        card.style.setProperty('--mx', (px * 100) + '%');
+        card.style.setProperty('--my', (py * 100) + '%');
+    };
+    const reset = () => {
+        card.style.transform = 'rotateX(0) rotateY(0) scale(1)';
+        card.style.setProperty('--mx', '50%');
+        card.style.setProperty('--my', '50%');
+    };
+    card.addEventListener('mousemove', onMove);
+    card.addEventListener('mouseleave', reset);
+    card.addEventListener('touchmove', onMove, { passive: true });
+    card.addEventListener('touchend', reset);
 }
 
 /* === PARTÍCULAS DE LA CARTA FINAL === */
@@ -397,7 +634,7 @@ function startFinalParticles() {
   window.addEventListener('resize', resize);
   
   const particles = [];
-  const symbols = ['♥', '✦', '✧', '🌸', '·'];
+  const symbols = ['♥️', '✦', '✧', '🌸', '·'];
   const colors = ['#ffcb05', '#ff6fa1', '#ffffff', '#ffd6e0', '#ffe680'];
   
   function spawn() {
@@ -433,7 +670,7 @@ function startFinalParticles() {
       ctx.globalAlpha = Math.max(0, p.alpha);
       ctx.fillStyle = p.color;
       ctx.shadowBlur = 12; ctx.shadowColor = p.color;
-      ctx.font = `${p.size}px serif`;
+      ctx.font = ${p.size}px serif;
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
       ctx.fillText(p.symbol, 0, 0);
       ctx.restore();
