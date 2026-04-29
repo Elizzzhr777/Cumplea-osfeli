@@ -442,7 +442,6 @@ function showLevels() {
 function startSpecificLevel(level) {
     hideAllScreens();
     currentPlayingLevel = level;
-    updateBackButtons();
     
     if(level === 1) {
         document.getElementById("playlist-screen").style.display = "flex";
@@ -461,12 +460,14 @@ function startSpecificLevel(level) {
 
         const card = document.getElementById('trainer-card');
 
-        // Evita múltiples listeners
         if (!card.dataset.listenerAdded) {
             card.addEventListener('click', finishTrainerLevel);
             card.dataset.listenerAdded = "true";
         }
     }
+
+    // 👇 AQUÍ, no arriba
+    updateBackButtons();
 }
 
 function completeCurrentLevel() {
