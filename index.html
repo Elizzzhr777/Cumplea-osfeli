@@ -365,9 +365,10 @@ button:active::after { width: 300px; height: 300px; transition: 0s; }
 <div id="final" class="screen">
   <canvas id="particles-canvas"></canvas>
   <div id="letter"></div>
+  <button id="final-back-btn" onclick="showLevels()" style="display:none; position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);">VOLVER AL MAPA</button>
 </div>
 <div id="trainer" class="screen">
-  <button onclick="showLevels()" style="position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);">VOLVER AL MAPA</button>
+  <button id="trainer-back-btn" onclick="showLevels()" style="display:none; position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);">VOLVER AL MAPA</button>
 </div>
 
 <script>
@@ -404,8 +405,19 @@ document.addEventListener('mouseover', (e) => {
 
 /* === LÓGICA ORIGINAL === */
 let currentPlayingLevel = 1;
-let highestUnlockedLevel = 1;
+let highestUnlockedLevel = parseInt(localStorage.getItem('highestUnlockedLevel') || '1', 10);
+let allLevelsCompleted = localStorage.getItem('allLevelsCompleted') === 'true';
 let particlesAnimId = null;
+
+// Si ya completó todo antes, desbloquear todos los niveles
+if (allLevelsCompleted) highestUnlockedLevel = 4;
+
+function updateBackButtons() {
+    const fb = document.getElementById('final-back-btn');
+    const tb = document.getElementById('trainer-back-btn');
+    if (fb) fb.style.display = allLevelsCompleted ? 'inline-block' : 'none';
+    if (tb) tb.style.display = allLevelsCompleted ? 'inline-block' : 'none';
+}
 
 function hideAllScreens() {
     document.querySelectorAll('.screen').forEach(el => el.style.display = "none");
@@ -429,6 +441,7 @@ function showLevels() {
 function startSpecificLevel(level) {
     hideAllScreens();
     currentPlayingLevel = level;
+    updateBackButtons();
     
     if(level === 1) {
         document.getElementById("playlist-screen").style.display = "flex";
@@ -444,6 +457,13 @@ function startSpecificLevel(level) {
     } else if(level === 4) {
         document.getElementById("trainer").style.display = "flex";
         initTrainerCardTilt();
+        // Si llegó al nivel 4, marca todo como completado para futuras visitas
+        if (!allLevelsCompleted) {
+            allLevelsCompleted = true;
+            localStorage.setItem('allLevelsCompleted', 'true');
+            highestUnlockedLevel = 4;
+            updateBackButtons();
+        }
     }
 }
 
@@ -454,6 +474,7 @@ function completeCurrentLevel() {
     }
     let next = currentPlayingLevel + 1;
     highestUnlockedLevel = Math.max(highestUnlockedLevel, next);
+    localStorage.setItem('highestUnlockedLevel', String(highestUnlockedLevel));
     
     hideAllScreens();
     document.getElementById("level-transition").style.display = "flex";
