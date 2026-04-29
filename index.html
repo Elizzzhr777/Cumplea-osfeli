@@ -98,7 +98,7 @@ h1, h2 {
    ============================================ */
 #level-select {
   flex-direction: column; justify-content: center; align-items: center;
-  background: url('fondo-mapa.gif') center center / cover no-repeat;
+  background: url('img-fondo2.gif') center center / cover no-repeat;
 }
 
 .level-btn {
@@ -123,7 +123,7 @@ h1, h2 {
    ============================================ */
 #playlist-screen {
   flex-direction: column; justify-content: center; align-items: center;
-  background: linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.55)), url('fondo-playlist.gif') center center / cover no-repeat;
+  background: linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.55)), url('img-fondo4.gif') center center / cover no-repeat;
 }
 .playlist-container {
   background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px);
@@ -162,7 +162,7 @@ h1, h2 {
    ============================================ */
 #battle { 
   flex-direction: column; justify-content: center; align-items: center; 
-  background: url('fondo-batalla.gif') center center / cover no-repeat;
+  background: url('img-fondo3.gif') center center / cover no-repeat;
   position: relative;
 }
 #battle > div { animation: pulseBorder 2.5s ease-in-out infinite; position: relative; z-index: 2; }
@@ -181,16 +181,11 @@ h1, h2 {
    ============================================ */
 #final { 
   justify-content: center; align-items: center; 
-  background: url('fondo-carta.gif') center center / cover no-repeat #111; 
+  background: url('img-fondo5.gif') center center / cover no-repeat #111; 
   transition: opacity 0.4s ease;
   position: relative;
 }
-#final::before {
-  content: ''; position: absolute; inset: 0;
-  background: url('Image-final.jpg') center/contain no-repeat;
-  opacity: 0; transition: opacity 0.5s ease;
-  pointer-events: none;
-}
+   
 #letter {
   background: rgba(0,0,0,0.85); width: 85%; max-width: 550px; padding: 30px;
   border: 2px solid #ffcb05; border-radius: 20px; white-space: pre-wrap;
