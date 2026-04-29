@@ -458,12 +458,13 @@ function startSpecificLevel(level) {
     } else if(level === 4) {
         document.getElementById("trainer").style.display = "flex";
         initTrainerCardTilt();
-        // Si llegó al nivel 4, marca todo como completado para futuras visitas
-        if (!allLevelsCompleted) {
-            allLevelsCompleted = true;
-            localStorage.setItem('allLevelsCompleted', 'true');
-            highestUnlockedLevel = 4;
-            updateBackButtons();
+
+        const card = document.getElementById('trainer-card');
+
+        // Evita múltiples listeners
+        if (!card.dataset.listenerAdded) {
+            card.addEventListener('click', finishTrainerLevel);
+            card.dataset.listenerAdded = "true";
         }
     }
 }
@@ -485,6 +486,14 @@ function completeCurrentLevel() {
 
 function goToNextLevel() {
     startSpecificLevel(currentPlayingLevel + 1);
+}
+
+// ✅ FUNCIÓN FINAL (FUERA de todo)
+function finishTrainerLevel() {
+    allLevelsCompleted = true;
+    localStorage.setItem('allLevelsCompleted', 'true');
+    highestUnlockedLevel = 4;
+    updateBackButtons();
 }
 
 function choice(v) {
