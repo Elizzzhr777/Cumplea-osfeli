@@ -72,23 +72,33 @@ button, .song-item, .level-btn, #trainer-card {
 
 /* 🌟 TÍTULOS ESTILO LOGO POKÉMON (degradado amarillo→dorado + borde azul) */
 h1, h2 {
+  position: relative;
+  display: inline-block;
   background: linear-gradient(180deg, #ffeb3b 0%, #ffcb05 45%, #d4a017 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-   text-shadow:
-      2px  2px 0px #000,
-      -2px -2px 0px #000,
-      2px -2px 0px #000,
-      -2px  2px 0px #000,
-      0px  2px 0px #000,
-      0px -2px 0px #000,
-      2px  0px 0px #000,
-      -2px  0px 0px #000;
- font-weight: 900;
+  font-weight: 900;
   letter-spacing: 2px;
-   -webkit-text-stroke: 0px transparent;
+  z-index: 1;
+  /* Eliminamos text-shadow y stroke de aquí para que el centro sea puro oro */
+  text-shadow: none;
+  -webkit-text-stroke: 0;
   animation: titleGlow 2.5s ease-in-out infinite;
+}
+
+/* El "Guardaespaldas": Este crea el borde negro por DETRÁS */
+h1::before, h2::before {
+  content: attr(data-text); /* Necesitas añadir data-text="TU TITULO" en el HTML */
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  -webkit-text-stroke: 6px #000000; /* Borde negro grueso */
+  -webkit-text-fill-color: #000000;
+  text-shadow: 4px 4px 0px #000000; /* Sombra sólida */
 }
 
 /* ============================================
