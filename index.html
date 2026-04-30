@@ -267,19 +267,6 @@ h1, h2 {
 }
 
 /* Textos pixel sobre la carta */
-.trainer-info {
-  position: absolute;
-  left: 50%; transform: translateX(-50%);
-  font-family: 'Courier New', monospace;
-  font-weight: bold;
-  color: #fff;
-  text-shadow: 2px 2px 0 #2a75bb, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
-  letter-spacing: 2px;
-  font-size: clamp(0.9rem, 2.2vw, 1.1rem);
-  z-index: 3;
-  pointer-events: none;
-  white-space: nowrap;
-}
 #trainer-name { top: 12%; }
 #trainer-level { top: 22%; color: #ffcb05; }
 #trainer-badges { bottom: 14%; color: #ff6fa1; }
@@ -385,9 +372,6 @@ button:active::after { width: 300px; height: 300px; transition: 0s; }
 
 <div id="trainer" class="screen">
   <div id="trainer-card">
-    <div class="trainer-info" id="trainer-name">Entrenador: Yon</div>
-    <div class="trainer-info" id="trainer-level">Nivel: 20</div>
-    <div class="trainer-info" id="trainer-badges">Medallas: Amor Infinito</div>
   </div>
   <button onclick="showLevels()" style="position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);">VOLVER AL MAPA</button>
 </div>
