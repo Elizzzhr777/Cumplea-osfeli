@@ -414,10 +414,11 @@ let particlesAnimId = null;
 if (allLevelsCompleted) highestUnlockedLevel = 4;
 
 function updateBackButtons() {
+    // El botón "VOLVER AL MAPA" del nivel 3 (carta final) solo aparece
+    // cuando el usuario YA completó todos los niveles al menos 1 vez (re-visita).
     const fb = document.getElementById('final-back-btn');
-    const tb = document.getElementById('trainer-back-btn');
     if (fb) fb.style.display = allLevelsCompleted ? 'inline-block' : 'none';
-    if (tb) tb.style.display = allLevelsCompleted ? 'inline-block' : 'none';
+    // El del trainer NO se toca aquí: lo controla el timer de 5s en startSpecificLevel(4).
 }
 
 function hideAllScreens() {
@@ -440,10 +441,13 @@ function showLevels() {
 }
 
 function startSpecificLevel(level) {
+    // 🔒 Verificar que el nivel esté desbloqueado
+    if (level > highestUnlockedLevel) return;
+
     hideAllScreens();
     currentPlayingLevel = level;
     updateBackButtons();
-    
+
     if(level === 1) {
         document.getElementById("playlist-screen").style.display = "flex";
     } else if(level === 2) {
@@ -458,12 +462,18 @@ function startSpecificLevel(level) {
     } else if(level === 4) {
         document.getElementById("trainer").style.display = "flex";
         initTrainerCardTilt();
-        // Si llegó al nivel 4, marca todo como completado para futuras visitas
+        // Si llegó al nivel 4, marca todo como completado (primera vuelta)
         if (!allLevelsCompleted) {
             allLevelsCompleted = true;
             localStorage.setItem('allLevelsCompleted', 'true');
             highestUnlockedLevel = 4;
-            updateBackButtons();
+            localStorage.setItem('highestUnlockedLevel', '4');
+        }
+        // 🕒 Mostrar botón "VOLVER AL MAPA" después de 5 segundos
+        const tb = document.getElementById('trainer-back-btn');
+        if (tb) {
+            tb.style.display = 'none';
+            setTimeout(() => { tb.style.display = 'inline-block'; }, 5000);
         }
     }
 }
