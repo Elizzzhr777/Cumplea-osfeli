@@ -406,20 +406,10 @@ document.addEventListener('mouseover', (e) => {
 
 /* === LÓGICA ORIGINAL === */
 let currentPlayingLevel = 1;
+// 🧹 Limpiar progreso anterior para que los niveles inicien bloqueados siempre
+localStorage.removeItem('allLevelsCompleted');
 let highestUnlockedLevel = parseInt(localStorage.getItem('highestUnlockedLevel') || '1', 10);
-let allLevelsCompleted = localStorage.getItem('allLevelsCompleted') === 'true';
 let particlesAnimId = null;
-
-// Si ya completó todo antes, desbloquear todos los niveles
-if (allLevelsCompleted) highestUnlockedLevel = 4;
-
-function updateBackButtons() {
-    // El botón "VOLVER AL MAPA" del nivel 3 (carta final) solo aparece
-    // cuando el usuario YA completó todos los niveles al menos 1 vez (re-visita).
-    const fb = document.getElementById('final-back-btn');
-    if (fb) fb.style.display = allLevelsCompleted ? 'inline-block' : 'none';
-    // El del trainer NO se toca aquí: lo controla el timer de 5s en startSpecificLevel(4).
-}
 
 function hideAllScreens() {
     document.querySelectorAll('.screen').forEach(el => el.style.display = "none");
@@ -436,6 +426,9 @@ function showLevels() {
         if(i <= highestUnlockedLevel) {
             btn.classList.remove("locked");
             btn.disabled = false;
+        } else {
+            btn.classList.add("locked");
+            btn.disabled = true;
         }
     }
 }
@@ -446,7 +439,6 @@ function startSpecificLevel(level) {
 
     hideAllScreens();
     currentPlayingLevel = level;
-    updateBackButtons();
 
     if(level === 1) {
         document.getElementById("playlist-screen").style.display = "flex";
@@ -462,14 +454,7 @@ function startSpecificLevel(level) {
     } else if(level === 4) {
         document.getElementById("trainer").style.display = "flex";
         initTrainerCardTilt();
-        // Si llegó al nivel 4, marca todo como completado (primera vuelta)
-        if (!allLevelsCompleted) {
-            allLevelsCompleted = true;
-            localStorage.setItem('allLevelsCompleted', 'true');
-            highestUnlockedLevel = 4;
-            localStorage.setItem('highestUnlockedLevel', '4');
-        }
-        // 🕒 Mostrar botón "VOLVER AL MAPA" después de 5 segundos
+        // 🕒 Mostrar botón "VOLVER AL MAPA" 5 segundos después de mostrar la trainer card
         const tb = document.getElementById('trainer-back-btn');
         if (tb) {
             tb.style.display = 'none';
